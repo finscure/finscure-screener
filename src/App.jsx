@@ -3,6 +3,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import ScreenerPage from "./pages/ScreenerPage";
 import LearnPage from "./pages/LearnPage";
+import CoursePage from "./pages/CoursePage";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<ScreenerPage />} />
             <Route path="/learn" element={<LearnPage />} />
+            <Route path="/learn/:courseId" element={<CoursePage />} />
           </Routes>
         </div>
       </BrowserRouter>
