@@ -45,7 +45,7 @@ export default function LessonViewer({ lesson, isCompleted, onMarkComplete, onNe
     onMarkComplete();
   };
 
-  const article = SAMPLE_ARTICLES[lesson.title] || DEFAULT_ARTICLE;
+  const article = lesson.content ? { content: lesson.content } : DEFAULT_ARTICLE;
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", padding: "32px 28px 48px" }}>

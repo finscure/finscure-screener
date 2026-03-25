@@ -1,65 +1,7 @@
+import { STOCK_MARKET_BASICS } from "./course_stock_basics";
+
 export const COURSES = [
-  {
-    id: "stock-market-basics",
-    title: "Stock Market Basics",
-    description: "Understand what stocks are, how exchanges work, and the fundamentals of investing in the Indian stock market.",
-    icon: "📊",
-    color: "#7c3aed",
-    duration: "4 hours",
-    lessons: 12,
-    level: "Beginner",
-    modules: [
-      {
-        id: "m1",
-        title: "Introduction to Stock Markets",
-        lessons: [
-          { id: "l1", title: "What is a Stock Market?", type: "video", videoUrl: "", duration: "12 min" },
-          { id: "l2", title: "NSE vs BSE — Understanding Indian Exchanges", type: "article", duration: "8 min" },
-          { id: "l3", title: "How Stock Prices are Determined", type: "video", videoUrl: "", duration: "15 min" },
-        ],
-        quiz: {
-          id: "q1",
-          questions: [
-            { q: "What does NSE stand for?", options: ["National Stock Exchange", "New Stock Exchange", "National Securities Exchange", "None of the above"], answer: 0 },
-            { q: "Who regulates the Indian stock market?", options: ["RBI", "SEBI", "NSDL", "BSE"], answer: 1 },
-            { q: "What is the primary index of NSE?", options: ["SENSEX", "NIFTY 50", "BSE 500", "NIFTY Bank"], answer: 1 },
-          ],
-        },
-      },
-      {
-        id: "m2",
-        title: "Types of Market Participants",
-        lessons: [
-          { id: "l4", title: "Retail Investors vs Institutional Investors", type: "article", duration: "10 min" },
-          { id: "l5", title: "Role of Brokers, SEBI, and Depositories", type: "video", videoUrl: "", duration: "18 min" },
-          { id: "l6", title: "Understanding Demat & Trading Accounts", type: "article", duration: "8 min" },
-        ],
-        quiz: {
-          id: "q2",
-          questions: [
-            { q: "What is a Demat account used for?", options: ["Trading stocks", "Holding stocks electronically", "Paying taxes", "Getting loans"], answer: 1 },
-            { q: "Which entity acts as a depository in India?", options: ["SEBI", "RBI", "NSDL/CDSL", "NSE"], answer: 2 },
-          ],
-        },
-      },
-      {
-        id: "m3",
-        title: "Placing Your First Trade",
-        lessons: [
-          { id: "l7", title: "Market Orders vs Limit Orders", type: "video", videoUrl: "", duration: "14 min" },
-          { id: "l8", title: "Understanding Bid-Ask Spread", type: "article", duration: "6 min" },
-          { id: "l9", title: "Reading a Stock Quote", type: "article", duration: "10 min" },
-        ],
-        quiz: {
-          id: "q3",
-          questions: [
-            { q: "A market order executes at:", options: ["A fixed price", "The best available price", "Yesterday's closing price", "Opening price"], answer: 1 },
-            { q: "What does 'LTP' stand for?", options: ["Last Traded Price", "Latest Trading Point", "Low Trading Price", "Limit Trade Price"], answer: 0 },
-          ],
-        },
-      },
-    ],
-  },
+  STOCK_MARKET_BASICS,
   {
     id: "technical-analysis",
     title: "Technical Analysis",
