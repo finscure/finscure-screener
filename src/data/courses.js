@@ -1,67 +1,9 @@
 import { STOCK_MARKET_BASICS } from "./course_stock_basics";
+import { TECHNICAL_ANALYSIS } from "./course_technical_analysis";
 
 export const COURSES = [
   STOCK_MARKET_BASICS,
-  {
-    id: "technical-analysis",
-    title: "Technical Analysis",
-    description: "Learn to read charts, identify patterns, and use technical indicators to make informed trading decisions.",
-    icon: "📈",
-    color: "#16a34a",
-    duration: "6 hours",
-    lessons: 15,
-    level: "Intermediate",
-    modules: [
-      {
-        id: "m1",
-        title: "Chart Basics",
-        lessons: [
-          { id: "l1", title: "Types of Charts — Line, Bar, Candlestick", type: "video", videoUrl: "", duration: "15 min" },
-          { id: "l2", title: "Reading Candlestick Patterns", type: "article", duration: "12 min" },
-          { id: "l3", title: "Support and Resistance Levels", type: "video", videoUrl: "", duration: "18 min" },
-        ],
-        quiz: {
-          id: "q1",
-          questions: [
-            { q: "Which chart type shows open, high, low, and close?", options: ["Line chart", "Bar chart", "Candlestick chart", "Both B and C"], answer: 3 },
-            { q: "A 'Doji' candlestick indicates:", options: ["Strong bullish trend", "Strong bearish trend", "Market indecision", "Gap up opening"], answer: 2 },
-          ],
-        },
-      },
-      {
-        id: "m2",
-        title: "Key Indicators",
-        lessons: [
-          { id: "l4", title: "Moving Averages — SMA & EMA", type: "video", videoUrl: "", duration: "20 min" },
-          { id: "l5", title: "RSI — Relative Strength Index", type: "article", duration: "15 min" },
-          { id: "l6", title: "MACD — Moving Average Convergence Divergence", type: "video", videoUrl: "", duration: "18 min" },
-          { id: "l7", title: "Bollinger Bands", type: "article", duration: "12 min" },
-        ],
-        quiz: {
-          id: "q2",
-          questions: [
-            { q: "An RSI above 70 typically indicates:", options: ["Oversold", "Overbought", "Neutral", "Bullish reversal"], answer: 1 },
-            { q: "What does MACD stand for?", options: ["Market Average Convergence Divergence", "Moving Average Convergence Divergence", "Moving Average Cross Direction", "Market Analysis Chart Data"], answer: 1 },
-          ],
-        },
-      },
-      {
-        id: "m3",
-        title: "Chart Patterns",
-        lessons: [
-          { id: "l8", title: "Head and Shoulders Pattern", type: "video", videoUrl: "", duration: "16 min" },
-          { id: "l9", title: "Double Top and Double Bottom", type: "article", duration: "10 min" },
-          { id: "l10", title: "Triangles, Flags, and Wedges", type: "video", videoUrl: "", duration: "20 min" },
-        ],
-        quiz: {
-          id: "q3",
-          questions: [
-            { q: "A Head and Shoulders pattern is typically:", options: ["Bullish continuation", "Bearish reversal", "Bullish reversal", "Neutral"], answer: 1 },
-          ],
-        },
-      },
-    ],
-  },
+  TECHNICAL_ANALYSIS,
   {
     id: "fundamental-analysis",
     title: "Fundamental Analysis",
