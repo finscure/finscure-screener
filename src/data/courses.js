@@ -1,54 +1,11 @@
 import { STOCK_MARKET_BASICS } from "./course_stock_basics";
 import { TECHNICAL_ANALYSIS } from "./course_technical_analysis";
+import { FUNDAMENTAL_ANALYSIS } from "./course_fundamental_analysis";
 
 export const COURSES = [
   STOCK_MARKET_BASICS,
   TECHNICAL_ANALYSIS,
-  {
-    id: "fundamental-analysis",
-    title: "Fundamental Analysis",
-    description: "Master the art of evaluating company financials — P/E ratios, balance sheets, and intrinsic valuations.",
-    icon: "🏦",
-    color: "#dc2626",
-    duration: "5 hours",
-    lessons: 14,
-    level: "Intermediate",
-    modules: [
-      {
-        id: "m1",
-        title: "Financial Statements",
-        lessons: [
-          { id: "l1", title: "Understanding Income Statements", type: "video", videoUrl: "", duration: "18 min" },
-          { id: "l2", title: "Balance Sheet Deep Dive", type: "article", duration: "15 min" },
-          { id: "l3", title: "Cash Flow Statements Explained", type: "video", videoUrl: "", duration: "16 min" },
-        ],
-        quiz: {
-          id: "q1",
-          questions: [
-            { q: "Revenue minus expenses equals:", options: ["Gross Profit", "Net Profit", "EBITDA", "Operating Profit"], answer: 1 },
-            { q: "Which statement shows a company's assets and liabilities?", options: ["Income Statement", "Cash Flow Statement", "Balance Sheet", "Annual Report"], answer: 2 },
-          ],
-        },
-      },
-      {
-        id: "m2",
-        title: "Valuation Ratios",
-        lessons: [
-          { id: "l4", title: "P/E Ratio — Price to Earnings", type: "video", videoUrl: "", duration: "14 min" },
-          { id: "l5", title: "P/B Ratio, EV/EBITDA, and PEG Ratio", type: "article", duration: "18 min" },
-          { id: "l6", title: "Dividend Yield and ROE", type: "video", videoUrl: "", duration: "12 min" },
-          { id: "l7", title: "Comparing Companies Using Ratios", type: "article", duration: "15 min" },
-        ],
-        quiz: {
-          id: "q2",
-          questions: [
-            { q: "A lower P/E ratio generally indicates:", options: ["Overvalued stock", "Undervalued or slow growth", "High debt", "Strong momentum"], answer: 1 },
-            { q: "ROE stands for:", options: ["Return on Equity", "Rate of Exchange", "Revenue over Expenses", "Return on Enterprise"], answer: 0 },
-          ],
-        },
-      },
-    ],
-  },
+  FUNDAMENTAL_ANALYSIS,
   {
     id: "trading-strategies",
     title: "Trading Strategies",
