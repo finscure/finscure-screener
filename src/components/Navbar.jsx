@@ -11,7 +11,7 @@ export default function Navbar() {
   const navLinks = [
     { to: "/", label: "Screener", icon: "📊" },
     { to: "/learn", label: "Learn", icon: "📚" },
-    { to: "/trade", label: "Mock Trade", icon: "⚡", soon: true },
+    { to: "/trade", label: "Mock Trade", icon: "⚡" },
     { to: "/strategy", label: "Strategies", icon: "🎯", soon: true },
   ];
 
