@@ -10,7 +10,7 @@ export default function Sidebar({ activePage, onNavigate }) {
     },
     {
       label: "Learn", items: [
-        { id: "courses", icon: "📚", label: "Courses", badge: "7" },
+        { id: "courses", icon: "📚", label: "Courses", badge: "30" },
         { id: "strategies", icon: "🎯", label: "Strategies" },
         { id: "recommendations", icon: "💡", label: "SEBI RA Picks" },
       ]
