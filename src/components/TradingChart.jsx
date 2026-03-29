@@ -303,7 +303,7 @@ export default function TradingChart({ symbol, ltp, changePercent }) {
 
   // ═══ RENDER ═══
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden', alignSelf: 'start' }}>
       {/* Chart Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderBottom: '1px solid var(--border)', flexWrap: 'wrap', gap: 10 }}>
         {/* Left: Stock info */}
