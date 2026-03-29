@@ -2,10 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// ═══════════════════════════════════════════════════
-// PASTE YOUR FIREBASE CONFIG BELOW
-// Get this from: Firebase Console > Project Settings > Your Apps > Config
-// ═══════════════════════════════════════════════════
+// ═══ PASTE YOUR FIREBASE CONFIG BELOW ═══
 const firebaseConfig = {
   apiKey: "AIzaSyCnLNoKgkXsME2U9gHVt4pFUZtv3xbMUTA",
   authDomain: "finscure-screener.firebaseapp.com",
@@ -20,5 +17,3 @@ export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 export const db = getFirestore(app);
 export default app;
-
-
