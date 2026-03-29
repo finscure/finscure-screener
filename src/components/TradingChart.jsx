@@ -130,6 +130,26 @@ export default function TradingChart({ symbol, ltp, changePercent }) {
         timeVisible: true,
         secondsVisible: false,
       },
+      localization: {
+        // IST = UTC+5:30 — display all times in Indian Standard Time
+        timeFormatter: (timestamp) => {
+          const date = new Date(timestamp * 1000);
+          // Convert UTC to IST by adding 5h30m
+          const ist = new Date(date.getTime() + (5 * 60 + 30) * 60 * 1000);
+          const h = ist.getUTCHours().toString().padStart(2, '0');
+          const m = ist.getUTCMinutes().toString().padStart(2, '0');
+          return `${h}:${m}`;
+        },
+        dateFormatter: (timestamp) => {
+          const date = new Date(timestamp * 1000);
+          const ist = new Date(date.getTime() + (5 * 60 + 30) * 60 * 1000);
+          const d = ist.getUTCDate();
+          const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const mon = months[ist.getUTCMonth()];
+          const y = ist.getUTCFullYear();
+          return `${d} ${mon} ${y}`;
+        },
+      },
       handleScroll: { mouseWheel: true, pressedMouseMove: true },
       handleScale: { mouseWheel: true, pinch: true },
     });
