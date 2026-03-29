@@ -28,16 +28,49 @@ const PLACEHOLDER_PAGES = {
   community: { title: "Community", subtitle: "Discussions, ideas & journeys", icon: "💬" },
 };
 
+const SEARCH_SHEET_URLS = [
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWUEPUEjhHmatIkwy4lF0pCpYk-RWQJHH_GZ411Of1Up4zCI3rc3LAFg19swY08w/pub?gid=1599136282&single=true&output=csv",
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQBPcckfsQIkHnfPAYyPpd8jA1mqxzJ1W8hSZNcBW6iaUY9CmXDmh4c5bOt-wD5OQ/pub?gid=1658167544&single=true&output=csv",
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw_stoaW3BHQHRxFQ7diKSYNlvMXVLdUTV7KCBb5csfV4GzQXI_KGud1-K5Hnejg/pub?gid=622298709&single=true&output=csv",
+];
+
+function parseSearchCSV(text) {
+  const rows = text.split("\n").slice(1).filter(r => r.trim());
+  const data = {};
+  for (const row of rows) {
+    const c = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+    const cl = c.map(x => x.replace(/^"|"$/g, "").trim());
+    if (cl[0] && parseFloat(cl[4]) > 0) data[cl[0]] = { symbol: cl[0], name: cl[1]||cl[0], ltp: parseFloat(cl[4]), change: parseFloat(cl[5])||0 };
+  }
+  return data;
+}
+
 export default function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [theme, setTheme] = useState(() => {
     try { return localStorage.getItem("finscure-theme") || "dark"; } catch { return "dark"; }
   });
+  const [stockPrices, setStockPrices] = useState({});
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     try { localStorage.setItem("finscure-theme", theme); } catch {}
   }, [theme]);
+
+  // Fetch stock prices for search (shared across app)
+  useEffect(() => {
+    async function fetchPrices() {
+      try {
+        const results = await Promise.allSettled(SEARCH_SHEET_URLS.map(u => fetch(u).then(r => r.text())));
+        const merged = {};
+        for (const r of results) if (r.status === "fulfilled") Object.assign(merged, parseSearchCSV(r.value));
+        if (Object.keys(merged).length > 0) setStockPrices(merged);
+      } catch (e) { console.error(e); }
+    }
+    fetchPrices();
+    const iv = setInterval(fetchPrices, 180000);
+    return () => clearInterval(iv);
+  }, []);
 
   function toggleTheme() { setTheme(t => t === "dark" ? "light" : "dark"); }
   function navigate(page) { setActivePage(page); window.scrollTo(0, 0); }
@@ -58,7 +91,7 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <TopNav activePage={activePage} onNavigate={navigate} onToggleTheme={toggleTheme} theme={theme} />
+      <TopNav activePage={activePage} onNavigate={navigate} onToggleTheme={toggleTheme} theme={theme} stockPrices={stockPrices} />
       <div className="app-layout">
         <Sidebar activePage={activePage} onNavigate={navigate} />
         <main className="main-content" key={activePage} style={{ animation: "fadeUp 0.4s ease" }}>
