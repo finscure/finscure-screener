@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import DashboardPage from "./pages/DashboardPage";
 import ScreenerPage from "./pages/ScreenerPage";
 import CoursesPage from "./pages/CoursesPage";
+import CourseDetailPage from "./pages/CourseDetailPage";
 import TradingPage from "./pages/TradingPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import "./styles/theme.css";
@@ -47,6 +48,7 @@ function parseSearchCSV(text) {
 
 export default function App() {
   const [activePage, setActivePage] = useState("dashboard");
+  const [activeCourse, setActiveCourse] = useState(null);
   const [theme, setTheme] = useState(() => {
     try { return localStorage.getItem("finscure-theme") || "dark"; } catch { return "dark"; }
   });
@@ -73,13 +75,20 @@ export default function App() {
   }, []);
 
   function toggleTheme() { setTheme(t => t === "dark" ? "light" : "dark"); }
-  function navigate(page) { setActivePage(page); window.scrollTo(0, 0); }
+  function navigate(page) { setActivePage(page); setActiveCourse(null); window.scrollTo(0, 0); }
+
+  function openCourse(courseId) { setActiveCourse(courseId); window.scrollTo(0, 0); }
 
   function renderPage() {
+    // If a course is open, show course detail page
+    if (activePage === "courses" && activeCourse) {
+      return <CourseDetailPage courseId={activeCourse} onBack={() => setActiveCourse(null)} />;
+    }
+
     switch (activePage) {
       case "dashboard": return <DashboardPage onNavigate={navigate} />;
       case "screener": return <ScreenerPage />;
-      case "courses": return <CoursesPage />;
+      case "courses": return <CoursesPage onOpenCourse={openCourse} />;
       case "trading": return <TradingPage />;
       default: {
         const ph = PLACEHOLDER_PAGES[activePage];
