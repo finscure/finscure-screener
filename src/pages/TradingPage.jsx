@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../config/firebase";
+import TradingChart from "../components/TradingChart";
 import { doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, getDocs, limit } from "firebase/firestore";
 import LoginModal from "./LoginModal";
 
@@ -170,15 +171,7 @@ export default function TradingPage() {
   const returnPct = (totalPnL / portfolio.startingCapital * 100).toFixed(2);
   const searchResults = search.length >= 2 ? Object.values(prices).filter(s => s.symbol.toLowerCase().includes(search.toLowerCase()) || s.name.toLowerCase().includes(search.toLowerCase())).slice(0, 6) : [];
 
-  // Chart SVG (simulated price line)
-  const chartPoints = Array.from({ length: 50 }, (_, i) => {
-    const base = stock.ltp || 100;
-    const noise = (Math.sin(i * 0.3) * base * 0.02) + (Math.random() - 0.5) * base * 0.01;
-    return base + noise - (stock.change >= 0 ? base * 0.01 : -base * 0.01) * ((50 - i) / 50);
-  });
-  const minP = Math.min(...chartPoints), maxP = Math.max(...chartPoints);
-  const chartPath = chartPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${(i / 49) * 760} ${240 - ((p - minP) / (maxP - minP || 1)) * 220}`).join(" ");
-  const areaPath = chartPath + ` L 760 240 L 0 240 Z`;
+  // Chart is now handled by TradingChart component
 
   return (
     <div>
@@ -196,46 +189,12 @@ export default function TradingPage() {
 
       {/* Trading Layout: Chart + Order Panel */}
       <div className="trading-layout">
-        {/* Chart Container */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 20px", borderBottom: "1px solid var(--border)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div>
-                <div style={{ fontSize: 18, fontWeight: 700 }}>{stock.symbol}</div>
-                <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{stock.name} · NSE</div>
-              </div>
-              <div>
-                <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 24, fontWeight: 600 }}>₹{stock.ltp?.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</span>
-                <span style={{ fontSize: 14, fontWeight: 600, marginLeft: 8, color: stock.change >= 0 ? "var(--green)" : "var(--red)" }}>{stock.change >= 0 ? "+" : ""}{stock.change?.toFixed(2)}%</span>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 3 }}>
-              {["1D", "1W", "1M", "3M", "1Y"].map((tf, i) => (
-                <button key={tf} style={{
-                  padding: "5px 12px", borderRadius: 6, fontSize: 12, fontWeight: 500,
-                  background: i === 0 ? "var(--green-dim)" : "none",
-                  border: i === 0 ? "1px solid rgba(99,220,160,0.2)" : "1px solid transparent",
-                  color: i === 0 ? "var(--green)" : "var(--text-muted)",
-                  cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-                }}>{tf}</button>
-              ))}
-            </div>
-          </div>
-          <div style={{ height: 300, padding: 20 }}>
-            <svg viewBox="0 0 760 260" style={{ width: "100%", height: "100%" }}>
-              {/* Grid lines */}
-              {[0, 65, 130, 195, 260].map(y => <line key={y} x1="0" y1={y} x2="760" y2={y} stroke="var(--chart-grid)" strokeWidth="1" />)}
-              {/* Area fill */}
-              <path d={areaPath} fill={stock.change >= 0 ? "url(#greenGrad)" : "url(#redGrad)"} />
-              {/* Line */}
-              <path d={chartPath} fill="none" stroke={stock.change >= 0 ? "var(--green)" : "var(--red)"} strokeWidth="2" />
-              <defs>
-                <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--green)" stopOpacity="0.15" /><stop offset="100%" stopColor="var(--green)" stopOpacity="0" /></linearGradient>
-                <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--red)" stopOpacity="0.15" /><stop offset="100%" stopColor="var(--red)" stopOpacity="0" /></linearGradient>
-              </defs>
-            </svg>
-          </div>
-        </div>
+        {/* Chart — Lightweight Charts with candlestick/line toggle + timeframes */}
+        <TradingChart
+          symbol={selectedStock}
+          ltp={stock.ltp}
+          changePercent={stock.change}
+        />
 
         {/* Order Panel */}
         <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, padding: 22 }}>
