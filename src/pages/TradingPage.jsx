@@ -170,6 +170,7 @@ export default function TradingPage() {
   const totalPnL = totalValue - portfolio.startingCapital;
   const returnPct = (totalPnL / portfolio.startingCapital * 100).toFixed(2);
   const searchResults = search.length >= 2 ? Object.values(prices).filter(s => s.symbol.toLowerCase().includes(search.toLowerCase()) || s.name.toLowerCase().includes(search.toLowerCase())).slice(0, 6) : [];
+  const holding = portfolio.holdings.find(h => h.symbol === selectedStock);
 
   // Chart is now handled by TradingChart component
 
@@ -196,110 +197,255 @@ export default function TradingPage() {
           changePercent={stock.change}
         />
 
-        {/* Order Panel */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, padding: 22 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 18 }}>Place Order</div>
+        {/* Right Column: Balance + Order Panel */}
+        <div>
+          {/* Portfolio Balance Card */}
+          <div style={{
+            background: "var(--bg-secondary)", borderRadius: 10, padding: 16,
+            marginBottom: 18, border: "1px solid var(--border)",
+          }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8 }}>Available Balance</div>
+            <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 22, fontWeight: 700, color: "var(--green)", marginTop: 4 }}>
+              {fmt(portfolio.cash)}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
+              Invested: {fmt(holdingsValue)} · P&L: <span style={{ color: totalPnL >= 0 ? "var(--green)" : "var(--red)" }}>{totalPnL >= 0 ? "+" : ""}{fmt(totalPnL)}</span>
+            </div>
+          </div>
 
-          {/* Stock search */}
-          <div style={{ marginBottom: 16, position: "relative" }}>
-            <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 6, fontWeight: 500 }}>Stock</div>
-            <input type="text" value={search || selectedStock} placeholder="Search stock..."
-              onChange={e => { setSearch(e.target.value); setShowResults(true); }}
-              onFocus={() => { if (search) setShowResults(true); }}
-              onBlur={() => setTimeout(() => setShowResults(false), 200)}
-              style={{
-                width: "100%", padding: "10px 14px", background: "var(--input-bg)",
+          {/* Order Panel */}
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, padding: 22 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 18 }}>Place Order</div>
+
+            {/* Buy/Sell toggle */}
+            <div style={{ display: "flex", gap: 4, marginBottom: 18, background: "var(--bg-secondary)", borderRadius: 8, padding: 3 }}>
+              <button onClick={() => { setOrderType("buy"); setOrderResult(null); }} style={{
+                flex: 1, padding: 9, border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer",
+                background: orderType === "buy" ? "var(--green-dim)" : "transparent",
+                color: orderType === "buy" ? "var(--green)" : "var(--text-secondary)",
+                fontFamily: "'DM Sans',sans-serif", transition: "all 0.15s",
+              }}>BUY</button>
+              <button onClick={() => { setOrderType("sell"); setOrderResult(null); }} style={{
+                flex: 1, padding: 9, border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer",
+                background: orderType === "sell" ? "var(--red-dim)" : "transparent",
+                color: orderType === "sell" ? "var(--red)" : "var(--text-secondary)",
+                fontFamily: "'DM Sans',sans-serif", transition: "all 0.15s",
+              }}>SELL</button>
+            </div>
+
+            {/* Stock Symbol */}
+            <div style={{ marginBottom: 16, position: "relative" }}>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 6, fontWeight: 500 }}>Stock Symbol</div>
+              <input type="text" value={search || selectedStock} placeholder="Search stock..."
+                onChange={e => { setSearch(e.target.value); setShowResults(true); }}
+                onFocus={() => { if (search) setShowResults(true); }}
+                onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                style={{
+                  width: "100%", boxSizing: "border-box", padding: "10px 14px", background: "var(--input-bg)",
+                  border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-primary)",
+                  fontSize: 15, fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, outline: "none",
+                  transition: "border 0.2s",
+                }}
+                onFocusCapture={e => e.target.style.borderColor = "var(--border-active)"}
+                onBlurCapture={e => e.target.style.borderColor = "var(--border)"}
+              />
+              {showResults && searchResults.length > 0 && (
+                <div style={{
+                  position: "absolute", top: "100%", left: 0, right: 0, background: "var(--bg-card)",
+                  border: "1px solid var(--border)", borderRadius: 8, boxShadow: "var(--shadow-lg)",
+                  zIndex: 50, marginTop: 4, maxHeight: 200, overflowY: "auto",
+                }}>
+                  {searchResults.map(s => (
+                    <div key={s.symbol} onClick={() => { setSelectedStock(s.symbol); setSearch(""); setShowResults(false); setQuantity(""); setOrderResult(null); }}
+                      style={{ padding: "10px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border)", fontSize: 13, transition: "background 0.1s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = "var(--hover-bg)"}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{s.symbol}</div>
+                        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.name}</div>
+                      </div>
+                      <span style={{ fontFamily: "'JetBrains Mono',monospace", color: s.change >= 0 ? "var(--green)" : "var(--red)" }}>₹{s.ltp?.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Quantity */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 6, fontWeight: 500 }}>Quantity</div>
+              <input type="number" value={quantity} onChange={e => { setQuantity(e.target.value); setOrderResult(null); }}
+                placeholder="Enter shares" min="1"
+                style={{
+                  width: "100%", boxSizing: "border-box", padding: "10px 14px", background: "var(--input-bg)",
+                  border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-primary)",
+                  fontSize: 15, fontFamily: "'JetBrains Mono',monospace", outline: "none",
+                  transition: "border 0.2s",
+                }}
+                onFocus={e => e.target.style.borderColor = "var(--border-active)"}
+                onBlur={e => e.target.style.borderColor = "var(--border)"}
+              />
+              {/* Quick quantity helpers */}
+              {stock.ltp > 0 && (
+                <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+                  {(orderType === "buy"
+                    ? [
+                        { label: "₹5K", val: Math.floor(5000 / stock.ltp) },
+                        { label: "₹10K", val: Math.floor(10000 / stock.ltp) },
+                        { label: "₹25K", val: Math.floor(25000 / stock.ltp) },
+                        { label: "Max", val: Math.floor(portfolio.cash / stock.ltp) },
+                      ]
+                    : [
+                        { label: "25%", val: Math.floor((holding?.qty || 0) * 0.25) },
+                        { label: "50%", val: Math.floor((holding?.qty || 0) * 0.5) },
+                        { label: "75%", val: Math.floor((holding?.qty || 0) * 0.75) },
+                        { label: "All", val: holding?.qty || 0 },
+                      ]
+                  ).filter(q => q.val > 0).map(q => (
+                    <button key={q.label} onClick={() => setQuantity(String(q.val))} style={{
+                      padding: "4px 10px", borderRadius: 6, fontSize: 10, fontWeight: 600,
+                      border: "1px solid var(--border)", cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+                      background: parseInt(quantity) === q.val ? "var(--green-dim)" : "var(--bg-secondary)",
+                      color: parseInt(quantity) === q.val ? "var(--green)" : "var(--text-muted)",
+                      transition: "all 0.15s",
+                    }}>{q.label} ({q.val})</button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Order Type */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 6, fontWeight: 500 }}>Order Type</div>
+              <select style={{
+                width: "100%", boxSizing: "border-box", padding: "10px 14px", background: "var(--input-bg)",
                 border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-primary)",
-                fontSize: 15, fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, outline: "none",
-              }}
-            />
-            {showResults && searchResults.length > 0 && (
-              <div style={{
-                position: "absolute", top: "100%", left: 0, right: 0, background: "var(--bg-card)",
-                border: "1px solid var(--border)", borderRadius: 8, boxShadow: "var(--shadow-lg)", zIndex: 50, marginTop: 4, maxHeight: 200, overflowY: "auto",
+                fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: "none", cursor: "pointer",
+                appearance: "none", WebkitAppearance: "none",
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center",
               }}>
-                {searchResults.map(s => (
-                  <div key={s.symbol} onClick={() => { setSelectedStock(s.symbol); setSearch(""); setShowResults(false); setQuantity(""); setOrderResult(null); }}
-                    style={{ padding: "10px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", borderBottom: "1px solid var(--border)", fontSize: 13 }}
-                    onMouseEnter={e => e.currentTarget.style.background = "var(--hover-bg)"}
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <span style={{ fontWeight: 600 }}>{s.symbol}</span>
-                    <span style={{ fontFamily: "'JetBrains Mono',monospace", color: s.change >= 0 ? "var(--green)" : "var(--red)" }}>₹{s.ltp?.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                <option value="market">Market Order</option>
+                <option value="limit">Limit Order</option>
+                <option value="stoploss">Stop Loss</option>
+              </select>
+            </div>
 
-          {/* Buy/Sell toggle */}
-          <div style={{ display: "flex", gap: 4, marginBottom: 18, background: "var(--bg-secondary)", borderRadius: 8, padding: 3 }}>
-            <button onClick={() => { setOrderType("buy"); setOrderResult(null); }} style={{
-              flex: 1, padding: 9, border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer",
-              background: orderType === "buy" ? "var(--green-dim)" : "transparent",
-              color: orderType === "buy" ? "var(--green)" : "var(--text-secondary)",
-              fontFamily: "'DM Sans',sans-serif",
-            }}>Buy</button>
-            <button onClick={() => { setOrderType("sell"); setOrderResult(null); }} style={{
-              flex: 1, padding: 9, border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer",
-              background: orderType === "sell" ? "var(--red-dim)" : "transparent",
-              color: orderType === "sell" ? "var(--red)" : "var(--text-secondary)",
-              fontFamily: "'DM Sans',sans-serif",
-            }}>Sell</button>
-          </div>
-
-          {/* Quantity */}
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 6, fontWeight: 500 }}>Quantity</div>
-            <input type="number" value={quantity} onChange={e => { setQuantity(e.target.value); setOrderResult(null); }} placeholder="Shares"
-              style={{
-                width: "100%", padding: "10px 14px", background: "var(--input-bg)",
-                border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-primary)",
-                fontSize: 15, fontFamily: "'JetBrains Mono',monospace", outline: "none",
-              }}
-            />
-          </div>
-
-          {/* Order Summary */}
-          {parseInt(quantity) > 0 && stock.ltp > 0 && (
+            {/* Order Summary */}
             <div style={{ background: "var(--bg-secondary)", borderRadius: 8, padding: 14, marginBottom: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0" }}>
                 <span style={{ color: "var(--text-muted)" }}>Price</span>
-                <span style={{ fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>₹{stock.ltp?.toFixed(2)}</span>
+                <span style={{ fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>
+                  {stock.ltp > 0 ? `₹${stock.ltp.toLocaleString("en-IN", { maximumFractionDigits: 2 })}` : "—"}
+                </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0" }}>
-                <span style={{ color: "var(--text-muted)" }}>Qty</span>
-                <span style={{ fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>{quantity}</span>
+                <span style={{ color: "var(--text-muted)" }}>Qty × Price</span>
+                <span style={{ fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>
+                  {parseInt(quantity) > 0 && stock.ltp > 0
+                    ? `₹${(parseInt(quantity) * stock.ltp).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`
+                    : "—"}
+                </span>
               </div>
-              <div style={{ height: 1, background: "var(--border)", margin: "6px 0" }} />
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 700 }}>
-                <span>Total</span>
-                <span style={{ fontFamily: "'JetBrains Mono',monospace", color: orderType === "buy" ? "var(--green)" : "var(--red)" }}>
-                  ₹{(parseInt(quantity) * stock.ltp).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0" }}>
+                <span style={{ color: "var(--text-muted)" }}>Brokerage</span>
+                <span style={{ fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>₹0.00</span>
+              </div>
+              <div style={{
+                display: "flex", justifyContent: "space-between", fontSize: 14,
+                borderTop: "1px solid var(--border)", paddingTop: 8, marginTop: 4,
+              }}>
+                <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>Total</span>
+                <span style={{
+                  fontWeight: 700, fontFamily: "'JetBrains Mono',monospace",
+                  color: parseInt(quantity) > 0 ? (orderType === "buy" ? "var(--green)" : "var(--red)") : "var(--text-secondary)",
+                }}>
+                  {parseInt(quantity) > 0 && stock.ltp > 0
+                    ? `₹${(parseInt(quantity) * stock.ltp).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`
+                    : "—"}
                 </span>
               </div>
             </div>
-          )}
 
-          {/* Result */}
-          {orderResult && (
+            {/* Available Funds Info */}
             <div style={{
-              padding: "10px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, marginBottom: 12,
-              background: orderResult.ok ? "var(--green-dim)" : "var(--red-dim)",
-              color: orderResult.ok ? "var(--green)" : "var(--red)",
-            }}>{orderResult.ok ? "✓ " : "⚠ "}{orderResult.msg}</div>
-          )}
-
-          {/* Execute button */}
-          <button onClick={executeTrade} disabled={!parseInt(quantity) || !stock.ltp}
-            style={{
-              width: "100%", padding: 13, border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700,
-              cursor: parseInt(quantity) && stock.ltp ? "pointer" : "default",
-              background: orderType === "buy" ? "var(--gradient-green)" : "linear-gradient(135deg, #f87171, #ef4444)",
-              color: orderType === "buy" ? "var(--btn-text)" : "#fff",
-              fontFamily: "'DM Sans',sans-serif", opacity: parseInt(quantity) && stock.ltp ? 1 : 0.4,
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              fontSize: 12, marginBottom: 14, padding: "8px 12px",
+              background: "var(--bg-secondary)", borderRadius: 8,
             }}>
-            {orderType === "buy" ? `Buy ${selectedStock}` : `Sell ${selectedStock}`}
-          </button>
+              <span style={{ color: "var(--text-muted)" }}>
+                {orderType === "buy" ? "Available Funds" : "Shares Available"}
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, color: "var(--text-primary)" }}>
+                {orderType === "buy"
+                  ? fmt(portfolio.cash)
+                  : `${holding?.qty || 0} shares`}
+              </span>
+            </div>
+
+            {/* Insufficient funds / shares warning */}
+            {parseInt(quantity) > 0 && stock.ltp > 0 && orderType === "buy" && (parseInt(quantity) * stock.ltp) > portfolio.cash && (
+              <div style={{
+                padding: "8px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, marginBottom: 12,
+                background: "var(--red-dim)", color: "var(--red)",
+              }}>
+                ⚠ Insufficient funds. Need {fmt(parseInt(quantity) * stock.ltp)}, available {fmt(portfolio.cash)}
+              </div>
+            )}
+            {parseInt(quantity) > 0 && orderType === "sell" && parseInt(quantity) > (holding?.qty || 0) && (
+              <div style={{
+                padding: "8px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, marginBottom: 12,
+                background: "var(--red-dim)", color: "var(--red)",
+              }}>
+                ⚠ Only {holding?.qty || 0} shares available to sell
+              </div>
+            )}
+
+            {/* P&L Preview for sell */}
+            {orderType === "sell" && holding && parseInt(quantity) > 0 && (
+              <div style={{
+                display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 12,
+                padding: "8px 12px", background: "var(--bg-secondary)", borderRadius: 8,
+              }}>
+                <span style={{ color: "var(--text-muted)" }}>Est. P&L</span>
+                <span style={{
+                  fontFamily: "'JetBrains Mono',monospace", fontWeight: 700,
+                  color: (stock.ltp - holding.avgPrice) >= 0 ? "var(--green)" : "var(--red)",
+                }}>
+                  {((stock.ltp - holding.avgPrice) * parseInt(quantity)) >= 0 ? "+" : ""}
+                  {fmt((stock.ltp - holding.avgPrice) * parseInt(quantity))}
+                </span>
+              </div>
+            )}
+
+            {/* Result */}
+            {orderResult && (
+              <div style={{
+                padding: "10px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, marginBottom: 12,
+                background: orderResult.ok ? "var(--green-dim)" : "var(--red-dim)",
+                color: orderResult.ok ? "var(--green)" : "var(--red)",
+              }}>{orderResult.ok ? "✓ " : "⚠ "}{orderResult.msg}</div>
+            )}
+
+            {/* Execute Button */}
+            <button onClick={executeTrade}
+              disabled={!parseInt(quantity) || !stock.ltp || (orderType === "buy" && (parseInt(quantity) * stock.ltp) > portfolio.cash) || (orderType === "sell" && parseInt(quantity) > (holding?.qty || 0))}
+              style={{
+                width: "100%", padding: 13, border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700,
+                cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+                background: orderType === "buy" ? "var(--gradient-green)" : "linear-gradient(135deg, #f87171, #ef4444)",
+                color: orderType === "buy" ? "var(--btn-text)" : "#fff",
+                opacity: (!parseInt(quantity) || !stock.ltp ||
+                  (orderType === "buy" && (parseInt(quantity) * stock.ltp) > portfolio.cash) ||
+                  (orderType === "sell" && parseInt(quantity) > (holding?.qty || 0))) ? 0.4 : 1,
+                transition: "transform 0.15s, box-shadow 0.15s, opacity 0.15s",
+              }}
+              onMouseEnter={e => { if (e.currentTarget.style.opacity !== '0.4') { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = orderType === "buy" ? "0 6px 24px rgba(99,220,160,0.25)" : "0 6px 24px rgba(248,113,113,0.25)"; }}}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+            >
+              {orderType === "buy" ? `Buy ${selectedStock}` : `Sell ${selectedStock}`}
+            </button>
+          </div>
         </div>
       </div>
 
