@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import TopNav from "./components/TopNav";
 import Sidebar from "./components/Sidebar";
 import DashboardPage from "./pages/DashboardPage";
@@ -8,6 +8,7 @@ import CoursesPage from "./pages/CoursesPage";
 import CourseDetailPage from "./pages/CourseDetailPage";
 import TradingPage from "./pages/TradingPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
+import OnboardingScreen from "./pages/OnboardingScreen";
 import "./styles/theme.css";
 
 const PLACEHOLDER_PAGES = {
@@ -46,7 +47,10 @@ function parseSearchCSV(text) {
   return data;
 }
 
-export default function App() {
+// Inner component that uses AuthContext
+function AppContent() {
+  const { user, userProfile, loading } = useAuth();
+
   const [activePage, setActivePage] = useState("dashboard");
   const [activeCourse, setActiveCourse] = useState(null);
   const [theme, setTheme] = useState(() => {
@@ -59,7 +63,6 @@ export default function App() {
     try { localStorage.setItem("finscure-theme", theme); } catch {}
   }, [theme]);
 
-  // Fetch stock prices for search (shared across app)
   useEffect(() => {
     async function fetchPrices() {
       try {
@@ -76,15 +79,27 @@ export default function App() {
 
   function toggleTheme() { setTheme(t => t === "dark" ? "light" : "dark"); }
   function navigate(page) { setActivePage(page); setActiveCourse(null); window.scrollTo(0, 0); }
-
   function openCourse(courseId) { setActiveCourse(courseId); window.scrollTo(0, 0); }
 
+  // Loading state
+  if (loading) return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-primary)" }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--gradient-green)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 700, color: "var(--btn-text)", marginBottom: 16 }}>F</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 14 }}>Loading Finscure...</div>
+      </div>
+    </div>
+  );
+
+  // Onboarding — show when user is logged in but hasn't picked a level
+  if (user && userProfile && !userProfile.level) {
+    return <OnboardingScreen />;
+  }
+
   function renderPage() {
-    // If a course is open, show course detail page
     if (activePage === "courses" && activeCourse) {
       return <CourseDetailPage courseId={activeCourse} onBack={() => setActiveCourse(null)} />;
     }
-
     switch (activePage) {
       case "dashboard": return <DashboardPage onNavigate={navigate} />;
       case "screener": return <ScreenerPage />;
@@ -99,14 +114,23 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
+    <>
       <TopNav activePage={activePage} onNavigate={navigate} onToggleTheme={toggleTheme} theme={theme} stockPrices={stockPrices} />
       <div className="app-layout">
         <Sidebar activePage={activePage} onNavigate={navigate} />
-        <main className="main-content" key={activePage} style={{ animation: "fadeUp 0.4s ease" }}>
+        <main className="main-content" key={activePage + (activeCourse || "")} style={{ animation: "fadeUp 0.4s ease" }}>
           {renderPage()}
         </main>
       </div>
+    </>
+  );
+}
+
+// Outer wrapper that provides AuthContext
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
     </AuthProvider>
   );
 }
