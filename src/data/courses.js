@@ -65,11 +65,17 @@ export const SECTIONS = [
 // Import detailed module content (populated modules)
 import { MODULE_01 } from "./modules/module_01";
 import { MODULE_02 } from "./modules/module_02";
+import { MODULE_03 } from "./modules/module_03";
+import { MODULE_04 } from "./modules/module_04";
+import { MODULE_05 } from "./modules/module_05";
 
 // Map of courseId → detailed modules (add more as content is created)
 const DETAILED_MODULES = {
   "01-getting-started": MODULE_01,
   "02-stock-exchanges": MODULE_02,
+  "03-candlestick-charts": MODULE_03,
+  "04-volume-price-action": MODULE_04,
+  "05-placing-orders": MODULE_05,
 };
 
 export const COURSES = [
@@ -96,11 +102,7 @@ export const COURSES = [
     description: "Learn to read Japanese candlestick charts — open, high, low, close (OHLC) data, timeframes, bullish and bearish candles, and how to interpret price action visually.",
     icon: "🕯", level: "Beginner", lessons: 8, duration: "3 hrs",
     thumb: "linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)",
-    modules: [{ id: "m1", title: "Candlestick Basics", lessons: [
-      { id: "l1", title: "OHLC — The Four Price Points", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "Every candle shows four prices: Open, High, Low, and Close — the foundation of all chart reading." }] },
-      { id: "l2", title: "Bullish vs Bearish Candles", type: "article", duration: "10 min", content: [{ type: "paragraph", text: "Green candle = close above open (buyers won). Red candle = close below open (sellers won)." }] },
-      { id: "l3", title: "Choosing the Right Timeframe", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "Daily charts for swing trading, 15-min for intraday, weekly for investing." }] },
-    ], quiz: { id: "q1", questions: [{ q: "A green candle means:", options: ["Price fell", "Close > Open", "High volume", "52-week high"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["03-candlestick-charts"] || [],
   },
   {
     id: "04-volume-price-action", num: "04", section: "foundation",
@@ -108,10 +110,7 @@ export const COURSES = [
     description: "Master the relationship between volume and price movement. Learn to identify accumulation, distribution, volume spikes, climax volume, and how smart money leaves footprints.",
     icon: "📊", level: "Beginner", lessons: 7, duration: "3 hrs",
     thumb: "linear-gradient(135deg, #4a1d96 0%, #7c3aed 100%)",
-    modules: [{ id: "m1", title: "Volume Analysis", lessons: [
-      { id: "l1", title: "Why Volume Matters", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "Volume confirms price moves. High volume = conviction. Low volume = suspicion." }] },
-      { id: "l2", title: "Accumulation & Distribution", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Accumulation is quiet buying by institutions. Distribution is quiet selling before a decline." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Rising price on LOW volume indicates:", options: ["Strong rally", "Weak rally, likely to reverse", "Institutional buying", "Breakout"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["04-volume-price-action"] || [],
   },
   {
     id: "05-placing-orders", num: "05", section: "foundation",
@@ -119,10 +118,7 @@ export const COURSES = [
     description: "Practical guide to market orders, limit orders, stop-loss orders, GTT (Good Till Triggered), bracket orders, cover orders, and AMO (After Market Orders) across major Indian brokers.",
     icon: "🛒", level: "Beginner", lessons: 5, duration: "2 hrs",
     thumb: "linear-gradient(135deg, #854d0e 0%, #d97706 100%)",
-    modules: [{ id: "m1", title: "Order Types Explained", lessons: [
-      { id: "l1", title: "Market vs Limit Orders", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "Market orders execute immediately. Limit orders execute only at your specified price." }] },
-      { id: "l2", title: "Stop-Loss & GTT Orders", type: "article", duration: "10 min", content: [{ type: "paragraph", text: "Stop-loss orders protect you from large losses. GTT orders stay active for up to a year." }] },
-    ], quiz: { id: "q1", questions: [{ q: "A limit order guarantees:", options: ["Execution", "Price", "Both", "Neither"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["05-placing-orders"] || [],
   },
 
   // ═══════════ FUNDAMENTAL ANALYSIS (4 modules) ═══════════

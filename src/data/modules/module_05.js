@@ -1,0 +1,160 @@
+// Module 05: Placing Orders & Order Types
+// 5 Lessons · 2 hrs · Beginner
+
+export const MODULE_05 = [
+  { id: "m1", title: "Order Types & Execution", lessons: [
+    {
+      id: "05-l1", title: "Market Orders — Instant Execution", type: "article", duration: "10 min",
+      content: [
+        { type: "heading", text: "The Simplest Order Type" },
+        { type: "paragraph", text: "A market order is the most basic instruction you can give your broker: 'Buy (or sell) this stock RIGHT NOW at whatever the current price is.' The exchange matches your order with the best available price immediately." },
+        { type: "video", text: "Market Orders — When and How to Use Them", duration: "6 min" },
+        { type: "heading", text: "How Market Orders Work" },
+        { type: "list", items: [
+          "You click 'Buy' with Market Order selected",
+          "Your broker sends the order to the exchange instantly",
+          "The exchange fills your order at the current best ask price (for buying)",
+          "If you're selling, it fills at the current best bid price",
+          "Execution is guaranteed (during market hours) — price is not guaranteed",
+        ]},
+        { type: "heading", text: "Pros and Cons" },
+        { type: "table", headers: ["Pros", "Cons"], rows: [
+          ["Instant execution", "You may get a slightly different price than expected (slippage)"],
+          ["Simple — just click and buy", "In volatile markets, slippage can be significant"],
+          ["Guaranteed fill (during market hours)", "Not suitable for illiquid stocks (wide bid-ask spread)"],
+          ["Best for liquid blue-chip stocks", "You have zero control over the execution price"],
+        ]},
+        { type: "example", label: "Slippage Example", text: "You see Reliance at ₹1,348 and place a market buy order. By the time your order reaches the exchange (milliseconds), the price moved to ₹1,348.50. You get filled at ₹1,348.50 — that's ₹0.50 slippage. On 100 shares, that's ₹50. On liquid stocks, slippage is minimal. On penny stocks, it can be ₹5-10 per share." },
+        { type: "callout", text: "Use market orders only for liquid stocks (Nifty 50 constituents). For anything else, use limit orders to control your price." },
+      ],
+      assessment: [
+        { q: "A market order guarantees:", options: ["A specific price", "Execution (fill)", "Both price and fill", "Neither"], answer: 1, explanation: "Market orders guarantee that your order gets filled, but the exact price may vary due to slippage." },
+        { q: "Slippage is highest on:", options: ["Reliance (very liquid)", "HDFC Bank (very liquid)", "A penny stock trading 5,000 shares/day", "Nifty 50 futures"], answer: 2, explanation: "Illiquid stocks have wide bid-ask spreads, causing significant slippage on market orders." },
+      ],
+    },
+    {
+      id: "05-l2", title: "Limit Orders — You Control the Price", type: "article", duration: "12 min",
+      content: [
+        { type: "heading", text: "Name Your Price" },
+        { type: "paragraph", text: "A limit order lets you specify the exact price at which you're willing to buy or sell. The order only executes if the market reaches your price. If it doesn't, the order stays pending (or expires)." },
+        { type: "video", text: "Limit Orders — The Smart Way to Trade", duration: "8 min" },
+        { type: "heading", text: "How Limit Orders Work" },
+        { type: "table", headers: ["Action", "You Set", "Executes When"], rows: [
+          ["Buy Limit", "Maximum price you'll pay (e.g., ₹1,340)", "Market price drops to ₹1,340 or below"],
+          ["Sell Limit", "Minimum price you'll accept (e.g., ₹1,380)", "Market price rises to ₹1,380 or above"],
+        ]},
+        { type: "example", label: "Buy Limit Example", text: "Reliance is at ₹1,348. You believe it'll dip to ₹1,330 before rising. You place a Buy Limit at ₹1,330. If price drops to ₹1,330 — your order fills automatically. If price goes up to ₹1,400 without dipping — your order stays unfilled and you miss the move. That's the tradeoff." },
+        { type: "heading", text: "Pros and Cons" },
+        { type: "table", headers: ["Pros", "Cons"], rows: [
+          ["Full price control — no slippage", "No guarantee of execution — price may never reach your limit"],
+          ["Can set and forget", "May miss a fast-moving stock that doesn't dip to your level"],
+          ["Better entry prices on average", "Partial fills possible (you might get 50 of 100 shares)"],
+          ["Works on all stocks, including illiquid ones", "Requires patience and price analysis"],
+        ]},
+        { type: "callout", text: "Pro tip: Set your buy limit slightly above a key support level, not exactly at it. If support is ₹1,330, place your limit at ₹1,333. Price often bounces 2-3 rupees above the exact level." },
+      ],
+      assessment: [
+        { q: "A buy limit order at ₹500 will execute when:", options: ["Price rises above ₹500", "Price drops to ₹500 or below", "At exactly 500 shares", "At market open only"], answer: 1, explanation: "Buy limits execute when the market price falls to or below your specified limit price." },
+        { q: "The main tradeoff of limit orders is:", options: ["Higher brokerage", "Price control but no fill guarantee", "Slower execution speed", "Can only be used on BSE"], answer: 1, explanation: "You control the price but risk the order never being filled if the market doesn't reach your level." },
+      ],
+    },
+    {
+      id: "05-l3", title: "Stop-Loss Orders — Protecting Your Capital", type: "article", duration: "14 min",
+      content: [
+        { type: "heading", text: "The Most Important Order Type" },
+        { type: "paragraph", text: "A stop-loss (SL) order is an instruction to sell a stock if its price falls to a specific level. Its purpose is simple but critical: limit your losses on a trade that goes against you. Professional traders consider stop-losses non-negotiable." },
+        { type: "video", text: "Stop-Loss Orders — Your Trading Safety Net", duration: "10 min" },
+        { type: "heading", text: "How Stop-Loss Works" },
+        { type: "list", items: [
+          "You buy HDFCBANK at ₹1,700",
+          "You set a Stop-Loss at ₹1,650 (maximum loss you'll accept = ₹50/share)",
+          "If HDFCBANK falls to ₹1,650, your SL order automatically triggers",
+          "The triggered SL becomes a market order and sells at the best available price",
+          "Your loss is limited to approximately ₹50/share instead of potentially ₹200+",
+        ]},
+        { type: "heading", text: "Stop-Loss (SL) vs Stop-Loss Limit (SL-L)" },
+        { type: "table", headers: ["Type", "Trigger Price", "After Trigger", "Risk"], rows: [
+          ["SL (Market)", "₹1,650", "Sells at market price immediately", "May get ₹1,648 due to slippage, but guaranteed fill"],
+          ["SL-L (Limit)", "₹1,650 trigger, ₹1,645 limit", "Sells only at ₹1,645 or better", "May NOT fill if price gaps below ₹1,645"],
+        ]},
+        { type: "warning", text: "SL-Limit orders can fail in a gap down. If a stock opens 5% below your SL-Limit price (due to overnight bad news), your order won't fill and you're stuck with a larger loss. For this reason, many traders prefer SL-Market for actual stop-losses." },
+        { type: "heading", text: "Where to Place Stop-Losses" },
+        { type: "list", items: [
+          "Below the recent support level (for long positions)",
+          "Above the recent resistance level (for short positions)",
+          "Using ATR (Average True Range) — 1.5x to 2x ATR below entry",
+          "Never use round numbers (₹1,700, ₹1,650) — place at ₹1,647 or ₹1,703",
+        ]},
+        { type: "callout", text: "The 2% Rule: Never risk more than 2% of your total portfolio on a single trade. If your portfolio is ₹5 lakh, your maximum loss per trade should be ₹10,000. Set your stop-loss accordingly." },
+      ],
+      assessment: [
+        { q: "The primary purpose of a stop-loss is to:", options: ["Maximize profits", "Limit losses to a predetermined amount", "Get a better entry price", "Avoid paying brokerage"], answer: 1, explanation: "Stop-losses protect your capital by automatically exiting a losing trade at your pre-set level." },
+        { q: "The 2% rule means:", options: ["Only buy stocks above ₹2", "Risk maximum 2% of portfolio per trade", "Trade only 2 stocks", "Keep 2% in cash"], answer: 1, explanation: "Never risk more than 2% of your total capital on any single trade — this ensures survival through losing streaks." },
+        { q: "Why should you avoid placing stop-losses at round numbers?", options: ["Round numbers are lucky", "Many traders place SL at same round numbers, causing stop-hunting", "Brokers charge more", "SEBI rule"], answer: 1, explanation: "Round numbers concentrate stop-losses, making them targets for stop-hunting. Place SL slightly above/below." },
+      ],
+    },
+    {
+      id: "05-l4", title: "GTT, Bracket & Cover Orders", type: "article", duration: "12 min",
+      content: [
+        { type: "heading", text: "Advanced Order Types for Indian Markets" },
+        { type: "paragraph", text: "Beyond basic market, limit, and stop-loss orders, Indian brokers offer several advanced order types that help automate your trading and manage risk more effectively." },
+        { type: "video", text: "GTT, Bracket & Cover Orders — When to Use Each", duration: "8 min" },
+        { type: "heading", text: "GTT — Good Till Triggered" },
+        { type: "paragraph", text: "A GTT order stays active for up to 1 year (on Zerodha) or until triggered. Perfect for long-term investors who want to set entry or exit prices and forget about them." },
+        { type: "example", label: "GTT Use Case", text: "INFY is at ₹1,520. You believe it's worth buying at ₹1,400 and selling at ₹1,800. Set two GTTs: Buy trigger at ₹1,400 and Sell trigger at ₹1,800. Now forget about it — the system monitors 24/7 and executes when your levels are hit." },
+        { type: "heading", text: "Bracket Order (BO)" },
+        { type: "paragraph", text: "A bracket order places three orders simultaneously: your entry order, a target (profit) order, and a stop-loss order. When one of the exit orders (target or SL) executes, the other is automatically cancelled." },
+        { type: "table", headers: ["Component", "Example", "Purpose"], rows: [
+          ["Entry", "Buy SBIN at ₹780 (limit)", "Your trade entry"],
+          ["Target", "Sell at ₹820 (limit)", "Book profit automatically"],
+          ["Stop-Loss", "Sell at ₹760 (SL)", "Cut losses automatically"],
+        ]},
+        { type: "heading", text: "Cover Order (CO)" },
+        { type: "paragraph", text: "A cover order is a market order with a compulsory stop-loss. It's designed for intraday trading and offers higher leverage because the SL limits your risk. You get a market entry + automatic SL, but no target — you must exit manually or it squares off at 3:20 PM." },
+        { type: "heading", text: "AMO — After Market Order" },
+        { type: "paragraph", text: "AMO lets you place orders outside market hours (after 3:30 PM or before 9:00 AM). The order enters the queue and executes when the market opens. Useful if you can't trade during market hours." },
+        { type: "callout", text: "Start with limit orders and stop-losses. Once comfortable, graduate to GTT for long-term positions and bracket orders for intraday trades." },
+      ],
+      assessment: [
+        { q: "A GTT order stays active for:", options: ["1 day only", "Up to 1 year", "1 hour", "Forever"], answer: 1, explanation: "GTT (Good Till Triggered) orders remain active until the trigger price is hit or up to 1 year." },
+        { q: "A bracket order includes:", options: ["Only buy order", "Entry + target + stop-loss (3 orders)", "Buy and sell only", "10 separate orders"], answer: 1, explanation: "Bracket orders bundle entry, profit target, and stop-loss — when one exit triggers, the other cancels." },
+        { q: "Cover orders are designed for:", options: ["Long-term investing", "Intraday trading with compulsory SL", "Mutual fund SIPs", "International trading"], answer: 1, explanation: "Cover orders are intraday-only and require a stop-loss, offering higher leverage in return." },
+      ],
+    },
+    {
+      id: "05-l5", title: "Practical Guide — Your First Order on Finscure", type: "article", duration: "10 min",
+      content: [
+        { type: "heading", text: "Let's Place Your First Trade" },
+        { type: "paragraph", text: "Now that you understand all order types, let's put theory into practice using Finscure's mock trading platform. You'll practice with virtual money at real NSE prices — zero risk, real learning." },
+        { type: "video", text: "Finscure Mock Trading — Step-by-Step Walkthrough", duration: "8 min" },
+        { type: "heading", text: "Step-by-Step: Buying Your First Stock" },
+        { type: "list", items: [
+          "Step 1: Navigate to 'Mock Trade' from the sidebar",
+          "Step 2: Set up your portfolio (choose starting capital — recommended ₹10 lakh for beginners)",
+          "Step 3: In the order panel, type 'RELIANCE' in the stock symbol field",
+          "Step 4: Select 'BUY' and enter quantity — try 10 shares",
+          "Step 5: Check the order summary — Price × Quantity = Total cost",
+          "Step 6: Verify you have sufficient available funds",
+          "Step 7: Click 'Buy RELIANCE' — your first trade is executed!",
+          "Step 8: Check the 'Positions' tab below — you'll see your holding with live P&L",
+        ]},
+        { type: "heading", text: "Practice Exercises" },
+        { type: "paragraph", text: "Complete these exercises to build muscle memory:" },
+        { type: "list", items: [
+          "Exercise 1: Buy 10 shares each of RELIANCE, TCS, and HDFCBANK",
+          "Exercise 2: Wait 5 minutes and check your P&L on each position",
+          "Exercise 3: Sell 5 shares of the stock that's losing the most (partial sell)",
+          "Exercise 4: Try buying a mid-cap stock (search for TATAPOWER or ZOMATO)",
+          "Exercise 5: Check your portfolio value, available cash, and total P&L",
+        ]},
+        { type: "info", text: "On Finscure, all trades execute as market orders at the current LTP (Last Traded Price). The chart shows real candlestick data via Yahoo Finance for daily+ timeframes." },
+        { type: "callout", text: "Congratulations! You've completed the Foundation section. You now understand stocks, exchanges, candlestick charts, volume, and how to place orders. Time to start your investing journey with mock trading!" },
+      ],
+      assessment: [
+        { q: "What's the recommended starting capital for beginners on mock trading?", options: ["₹1,000", "₹10 lakh", "₹1 crore", "₹100"], answer: 1, explanation: "₹10 lakh gives enough virtual capital to practice diversification across multiple stocks." },
+        { q: "After buying a stock on Finscure, you can track your P&L in:", options: ["Email inbox", "The Positions tab below the chart", "SEBI website", "SMS alerts"], answer: 1, explanation: "All open positions with live P&L are shown in the Positions tab on the Mock Trade page." },
+        { q: "The safest way to learn trading is:", options: ["Invest real money immediately", "Follow tips from strangers", "Practice on mock trading first", "Avoid the market entirely"], answer: 2, explanation: "Mock trading lets you learn from mistakes without financial consequences — always practice first." },
+      ],
+    },
+  ]},
+];

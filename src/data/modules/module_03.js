@@ -1,0 +1,220 @@
+// Module 03: Reading Candlestick Charts
+// 8 Lessons · 3 hrs · Beginner
+
+export const MODULE_03 = [
+  { id: "m1", title: "Candlestick Fundamentals", lessons: [
+    {
+      id: "03-l1", title: "The Anatomy of a Candlestick", type: "article", duration: "12 min",
+      content: [
+        { type: "heading", text: "From Japan to Dalal Street" },
+        { type: "paragraph", text: "Candlestick charts were invented by Japanese rice trader Munehisa Homma in the 1700s. Over 200 years later, they remain the most popular chart type used by traders worldwide — including on every Indian trading platform." },
+        { type: "video", text: "Candlestick Anatomy — OHLC Explained Visually", duration: "8 min" },
+        { type: "heading", text: "The Four Price Points — OHLC" },
+        { type: "paragraph", text: "Every single candlestick encodes four prices from a specific time period:" },
+        { type: "list", items: [
+          "Open (O) — The first traded price when the period starts",
+          "High (H) — The highest price reached during the period",
+          "Low (L) — The lowest price reached during the period",
+          "Close (C) — The last traded price when the period ends",
+        ]},
+        { type: "heading", text: "Body and Wicks" },
+        { type: "paragraph", text: "The thick rectangular part of the candle is called the body. It shows the range between Open and Close. The thin lines extending above and below the body are called wicks (or shadows). The upper wick shows the High, and the lower wick shows the Low." },
+        { type: "example", label: "Reading a Green Candle", text: "A green candle with Open at ₹100, Close at ₹110, High at ₹112, Low at ₹98: The body spans ₹100 to ₹110 (buyers pushed price up ₹10). Upper wick to ₹112 means price briefly went higher but sellers pushed it back. Lower wick to ₹98 means price dipped but buyers defended." },
+        { type: "callout", text: "The body tells you WHO won (buyers or sellers). The wicks tell you HOW the battle was fought. Both matter." },
+      ],
+      assessment: [
+        { q: "OHLC stands for:", options: ["Open, Halt, Low, Close", "Open, High, Low, Close", "Order, High, Limit, Cancel", "Open, High, Last, Current"], answer: 1, explanation: "OHLC = Open, High, Low, Close — the four prices every candle represents." },
+        { q: "The thick part of a candlestick is called the:", options: ["Wick", "Shadow", "Body", "Tail"], answer: 2, explanation: "The body shows the range between Open and Close prices." },
+        { q: "A long upper wick indicates:", options: ["Strong buying", "Price went high but sellers pushed it back down", "Low volume", "Market is closed"], answer: 1, explanation: "A long upper wick means price reached higher but couldn't sustain — sellers stepped in." },
+      ],
+    },
+    {
+      id: "03-l2", title: "Bullish vs Bearish Candles", type: "article", duration: "10 min",
+      content: [
+        { type: "heading", text: "Green vs Red — Who Won?" },
+        { type: "paragraph", text: "The color of a candle instantly tells you whether buyers or sellers dominated that time period." },
+        { type: "video", text: "Bullish and Bearish Candles — Quick Guide", duration: "6 min" },
+        { type: "table", headers: ["Feature", "Bullish (Green) Candle", "Bearish (Red) Candle"], rows: [
+          ["Close vs Open", "Close > Open", "Close < Open"],
+          ["Who Won", "Buyers dominated", "Sellers dominated"],
+          ["Body Direction", "Body starts at Open (bottom), ends at Close (top)", "Body starts at Open (top), ends at Close (bottom)"],
+          ["Sentiment", "Optimistic / Demand", "Pessimistic / Supply"],
+        ]},
+        { type: "heading", text: "Size Matters" },
+        { type: "paragraph", text: "The size of the body tells you the conviction behind the move:" },
+        { type: "list", items: [
+          "Large body — Strong conviction. Buyers (green) or sellers (red) were decisively in control.",
+          "Small body — Indecision. Neither side dominated. Often seen before reversals.",
+          "No body (Doji) — Open and Close are nearly identical. Maximum indecision. Very important signal.",
+        ]},
+        { type: "warning", text: "Never make decisions based on a single candle. Always look at context — what came before it, where it formed (support/resistance), and volume." },
+        { type: "callout", text: "A large green candle at a support level = strong buying signal. The same candle in the middle of nowhere = less meaningful." },
+      ],
+      assessment: [
+        { q: "A green candle means:", options: ["Price fell", "Close is above Open", "High volume day", "52-week high"], answer: 1, explanation: "Green = Close > Open. Buyers pushed the price higher during that period." },
+        { q: "A Doji candle indicates:", options: ["Strong buying", "Strong selling", "Indecision — Open ≈ Close", "Market holiday"], answer: 2, explanation: "When Open and Close are nearly equal, it forms a Doji — signaling indecision between buyers and sellers." },
+      ],
+    },
+    {
+      id: "03-l3", title: "Timeframes — Choosing the Right View", type: "article", duration: "12 min",
+      content: [
+        { type: "heading", text: "Same Stock, Different Stories" },
+        { type: "paragraph", text: "A stock can look bullish on a daily chart and bearish on a 5-minute chart at the exact same time. The timeframe you choose determines the story you see." },
+        { type: "video", text: "Chart Timeframes — Which One Should You Use?", duration: "8 min" },
+        { type: "heading", text: "Common Timeframes" },
+        { type: "table", headers: ["Timeframe", "Each Candle Represents", "Best For", "Typical User"], rows: [
+          ["1 minute", "1 minute of trading", "Scalping", "Professional day traders"],
+          ["5 minutes", "5 minutes", "Intraday trading", "Active day traders"],
+          ["15 minutes", "15 minutes", "Intraday decisions", "Intraday + swing overlap"],
+          ["1 hour", "1 hour", "Short-term swing", "Swing traders"],
+          ["Daily", "1 full trading day", "Swing trading", "Most common for analysis"],
+          ["Weekly", "1 week (Mon–Fri)", "Position trading", "Medium-term investors"],
+          ["Monthly", "1 calendar month", "Long-term trends", "Investors"],
+        ]},
+        { type: "heading", text: "Multi-Timeframe Analysis" },
+        { type: "paragraph", text: "Professional traders use multiple timeframes together. A common approach:" },
+        { type: "list", items: [
+          "Higher timeframe (Weekly) — Identify the overall trend direction",
+          "Middle timeframe (Daily) — Find key levels and patterns",
+          "Lower timeframe (15min/Hourly) — Time your exact entry and exit",
+        ]},
+        { type: "example", label: "Multi-Timeframe Example", text: "Reliance Weekly chart shows an uptrend. Daily chart shows price pulled back to a support zone. 15-min chart shows a bullish engulfing pattern at that support. This confluence of signals across timeframes gives you a high-probability buy setup." },
+        { type: "callout", text: "As a beginner, start with Daily charts. They filter out noise and are the most widely analyzed timeframe. Add 15-min charts once you're comfortable." },
+      ],
+      assessment: [
+        { q: "A daily candle represents:", options: ["1 minute of trading", "1 hour of trading", "1 full trading day", "1 week of trading"], answer: 2, explanation: "Each daily candle shows the OHLC for one complete trading day (9:15 AM to 3:30 PM)." },
+        { q: "Multi-timeframe analysis uses:", options: ["Only 1-minute charts", "Multiple timeframes together for confirmation", "Only monthly charts", "Random timeframes"], answer: 1, explanation: "Using higher timeframes for trend + lower timeframes for entry gives better trade accuracy." },
+        { q: "Beginners should start with which timeframe?", options: ["1-minute", "5-minute", "Daily", "Monthly"], answer: 2, explanation: "Daily charts filter intraday noise and are the most commonly analyzed timeframe." },
+      ],
+    },
+    {
+      id: "03-l4", title: "Reading Price Action — What Candles Tell You", type: "article", duration: "14 min",
+      content: [
+        { type: "heading", text: "Beyond Colors — Reading the Story" },
+        { type: "paragraph", text: "Price action is the art of reading raw candlestick data to understand market sentiment without relying on indicators. Every candle tells a micro-story about the battle between buyers and sellers." },
+        { type: "video", text: "Price Action Reading — The Candle Story Method", duration: "10 min" },
+        { type: "heading", text: "What to Observe in Every Candle" },
+        { type: "list", items: [
+          "Body size — Large body = conviction, small body = indecision",
+          "Wick length — Long wicks = rejection of price levels, short wicks = smooth move",
+          "Upper vs lower wick ratio — Which side shows more rejection?",
+          "Position of close within range — Close near high = bullish, close near low = bearish",
+          "Candle relative to previous candles — Is it bigger? Smaller? Overlapping?",
+        ]},
+        { type: "heading", text: "Three Key Candle Stories" },
+        { type: "example", label: "Story 1: Conviction", text: "A large green candle with tiny wicks. Buyers opened the bidding and never looked back. The close is near the high. This shows strong, uncontested buying — very bullish." },
+        { type: "example", label: "Story 2: Rejection", text: "A candle with a tiny body and very long upper wick. Price shot up but was violently rejected. Sellers overwhelmed buyers at the higher level. This often appears at resistance zones." },
+        { type: "example", label: "Story 3: Indecision", text: "A small-bodied candle (Doji or Spinning Top) with wicks on both sides. Both buyers and sellers tried but neither won. Often appears before a trend change — the current trend is losing steam." },
+        { type: "callout", text: "Price action is a skill that improves with screen time. Spend 15 minutes daily just observing candles on Nifty 50 without trading — build your 'candle reading muscle'." },
+      ],
+      assessment: [
+        { q: "A candle with a long upper wick and small body suggests:", options: ["Strong buying", "Price was rejected at higher levels", "Low volume", "Bullish continuation"], answer: 1, explanation: "Long upper wick = price went up but was pushed back down. Sellers rejected the higher price." },
+        { q: "Close near the high of a candle indicates:", options: ["Bearish sentiment", "Bullish sentiment — buyers in control", "Market indecision", "Low liquidity"], answer: 1, explanation: "When price closes near its high, buyers maintained control throughout the period." },
+      ],
+    },
+    {
+      id: "03-l5", title: "Line Charts vs Bar Charts vs Candlesticks", type: "article", duration: "10 min",
+      content: [
+        { type: "heading", text: "Three Ways to See the Same Data" },
+        { type: "paragraph", text: "While candlesticks are the most popular, it's worth understanding other chart types and when each is useful." },
+        { type: "video", text: "Chart Types Compared — Line, Bar, Candlestick", duration: "6 min" },
+        { type: "table", headers: ["Chart Type", "Shows", "Best For", "Limitation"], rows: [
+          ["Line Chart", "Close prices only, connected by a line", "Quick trend overview, long-term view", "Hides OHLC detail, no wick info"],
+          ["Bar Chart (OHLC)", "Open, High, Low, Close as horizontal ticks on a vertical line", "Compact view of OHLC", "Harder to read quickly than candles"],
+          ["Candlestick", "OHLC with colored bodies and wicks", "Most detailed, pattern recognition", "Can feel cluttered on very short timeframes"],
+        ]},
+        { type: "heading", text: "When to Use Each" },
+        { type: "list", items: [
+          "Line chart — Quick glance at multi-year trends, comparing multiple stocks on one chart",
+          "Bar chart — Used by some old-school technical analysts, rarely preferred over candles",
+          "Candlestick — Default choice for almost all analysis. Use this 95% of the time",
+        ]},
+        { type: "callout", text: "On Finscure's mock trading chart, you can toggle between Line and Candlestick views. Practice reading both to see how the same data looks different." },
+      ],
+      assessment: [
+        { q: "A line chart shows:", options: ["OHLC data", "Only closing prices", "Only volume", "Only opening prices"], answer: 1, explanation: "Line charts connect closing prices only — they don't show Open, High, or Low." },
+        { q: "The most information-rich chart type is:", options: ["Line", "Bar", "Candlestick", "Pie chart"], answer: 2, explanation: "Candlesticks show OHLC with visual color coding, making patterns easy to spot." },
+      ],
+    },
+    {
+      id: "03-l6", title: "Gaps in Charts — What They Mean", type: "article", duration: "12 min",
+      content: [
+        { type: "heading", text: "When Price Jumps" },
+        { type: "paragraph", text: "A gap occurs when a stock opens significantly higher or lower than the previous day's close, creating an empty space on the chart where no trading occurred. Gaps are important signals that indicate strong sentiment changes." },
+        { type: "video", text: "Chart Gaps — Types and Trading Implications", duration: "8 min" },
+        { type: "heading", text: "Types of Gaps" },
+        { type: "table", headers: ["Gap Type", "What It Means", "Usually Fills?"], rows: [
+          ["Common Gap", "Occurs randomly, no major catalyst", "Yes — usually fills within days"],
+          ["Breakaway Gap", "Marks the start of a new trend (gap out of a pattern)", "Rarely fills quickly"],
+          ["Runaway/Continuation Gap", "Appears mid-trend, shows acceleration", "Sometimes fills eventually"],
+          ["Exhaustion Gap", "Appears at the end of a trend, last push", "Fills quickly — signals reversal"],
+        ]},
+        { type: "heading", text: "Gap Up vs Gap Down" },
+        { type: "list", items: [
+          "Gap Up — Opens above previous close. Caused by overnight positive news, strong quarterly results, or global market rally.",
+          "Gap Down — Opens below previous close. Caused by negative earnings surprise, global sell-off, or company-specific bad news.",
+        ]},
+        { type: "example", label: "Gap Example", text: "TCS closes at ₹3,700 on Thursday. After market hours, it reports record Q4 results. On Friday, it opens at ₹3,850 — a ₹150 gap up. The gap space between ₹3,700 and ₹3,850 had no trading activity." },
+        { type: "info", text: "'Gap fill' is a common concept — prices often return to fill the gap zone eventually. But 'breakaway gaps' from strong patterns may never fill." },
+        { type: "callout", text: "Never chase a gap up blindly. Wait to see if the gap holds (price stays above the gap) or fills (price drops back into the gap zone)." },
+      ],
+      assessment: [
+        { q: "A gap up means:", options: ["Price dropped overnight", "Stock opens above previous close", "Market is closed", "Volume is zero"], answer: 1, explanation: "Gap up = opening price is higher than the previous day's closing price, creating an empty space." },
+        { q: "Which gap type signals the start of a new trend?", options: ["Common gap", "Breakaway gap", "Exhaustion gap", "No gap"], answer: 1, explanation: "Breakaway gaps occur at pattern breakouts and often signal the beginning of a strong new trend." },
+      ],
+    },
+    {
+      id: "03-l7", title: "Volume and Candles — The Complete Picture", type: "article", duration: "12 min",
+      content: [
+        { type: "heading", text: "Price Tells You What — Volume Tells You Why" },
+        { type: "paragraph", text: "A large green candle on high volume is a completely different signal from the same candle on low volume. Volume is the number of shares traded during a period, and it validates or questions every price move." },
+        { type: "video", text: "Reading Volume with Candlesticks", duration: "8 min" },
+        { type: "heading", text: "Volume-Price Relationships" },
+        { type: "table", headers: ["Price Move", "Volume", "Interpretation", "Signal"], rows: [
+          ["Rising price", "Rising volume", "Strong move, confirmed by participation", "Bullish ✅"],
+          ["Rising price", "Falling volume", "Weak rally, losing conviction", "Warning ⚠️"],
+          ["Falling price", "Rising volume", "Strong selling, panic or distribution", "Bearish 🔴"],
+          ["Falling price", "Falling volume", "Sellers exhausting, decline slowing", "Potential bottom 🟡"],
+        ]},
+        { type: "heading", text: "Volume Spikes" },
+        { type: "paragraph", text: "A sudden spike in volume (3x or more of average) is always significant. It often marks turning points — either institutional accumulation (buying) or distribution (selling)." },
+        { type: "example", label: "Volume Spike Example", text: "HDFC Bank typically trades 5 million shares daily. On a day it trades 20 million shares with a large green candle, institutions are likely accumulating heavily. This is a strong bullish signal." },
+        { type: "callout", text: "Always display volume bars below your candlestick chart. On Finscure's trading chart, volume bars are shown automatically — green for up days, red for down days." },
+      ],
+      assessment: [
+        { q: "Rising price with FALLING volume indicates:", options: ["Strong bull run", "Weak rally — losing momentum", "Institutional buying", "Market holiday"], answer: 1, explanation: "When fewer participants drive the price up, the rally lacks conviction and may reverse." },
+        { q: "A volume spike of 4x average volume usually indicates:", options: ["Technical error", "Institutional activity — major move", "Low liquidity", "Random noise"], answer: 1, explanation: "Volume spikes far above average signal significant institutional participation." },
+      ],
+    },
+    {
+      id: "03-l8", title: "Practice — Reading Real NSE Charts", type: "article", duration: "14 min",
+      content: [
+        { type: "heading", text: "Putting It All Together" },
+        { type: "paragraph", text: "Let's apply everything you've learned to read real charts. The goal is to look at any candlestick chart and quickly understand the story it's telling." },
+        { type: "video", text: "Live Chart Reading Practice — NIFTY & RELIANCE", duration: "12 min" },
+        { type: "heading", text: "Your Chart Reading Checklist" },
+        { type: "list", items: [
+          "Step 1: What's the overall trend? (Zoom out to weekly — uptrend, downtrend, or sideways?)",
+          "Step 2: Where is price relative to key levels? (Near support? Resistance? In the middle of a range?)",
+          "Step 3: What does the most recent candle tell you? (Big body or small? Long wicks?)",
+          "Step 4: What does volume confirm? (Is volume supporting the price move?)",
+          "Step 5: Are there any gaps? (Gap up/down — what type?)",
+        ]},
+        { type: "heading", text: "Practice Exercise" },
+        { type: "paragraph", text: "Open Finscure's Mock Trading page and select RELIANCE. Switch to the Daily timeframe. Answer these questions:" },
+        { type: "list", items: [
+          "What's the 6-month trend? (Look at the overall direction of candles)",
+          "Find 3 large green candles — are they on higher volume?",
+          "Find a candle with a long upper wick — what level was it at?",
+          "Are there any gaps? Were they filled or unfilled?",
+        ]},
+        { type: "info", text: "Practice this exercise with 5 different stocks every day for a week. By day 7, you'll read charts naturally without thinking about rules." },
+        { type: "callout", text: "Congratulations! You've completed the Candlestick Charts module. You can now read any candlestick chart and understand what buyers and sellers are doing. Next module: Volume & Price Action goes even deeper." },
+      ],
+      assessment: [
+        { q: "The first step in reading a chart is:", options: ["Buy immediately", "Identify the overall trend", "Count the candles", "Check the news"], answer: 1, explanation: "Always start by identifying the trend direction on a higher timeframe before analyzing individual candles." },
+        { q: "How should you practice chart reading?", options: ["Only read books", "Analyze 5 real stocks daily", "Only use 1-minute charts", "Avoid looking at charts"], answer: 1, explanation: "Regular practice with real charts is the fastest way to develop chart reading skills." },
+      ],
+    },
+  ]},
+];
