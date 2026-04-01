@@ -68,6 +68,14 @@ import { MODULE_02 } from "./modules/module_02";
 import { MODULE_03 } from "./modules/module_03";
 import { MODULE_04 } from "./modules/module_04";
 import { MODULE_05 } from "./modules/module_05";
+import { MODULE_06 } from "./modules/module_06";
+import { MODULE_07 } from "./modules/module_07";
+import { MODULE_08 } from "./modules/module_08";
+import { MODULE_09 } from "./modules/module_09";
+import { MODULE_10 } from "./modules/module_10";
+import { MODULE_11 } from "./modules/module_11";
+import { MODULE_12 } from "./modules/module_12";
+import { MODULE_13 } from "./modules/module_13";
 
 // Map of courseId → detailed modules (add more as content is created)
 const DETAILED_MODULES = {
@@ -76,6 +84,14 @@ const DETAILED_MODULES = {
   "03-candlestick-charts": MODULE_03,
   "04-volume-price-action": MODULE_04,
   "05-placing-orders": MODULE_05,
+  "06-financial-statements": MODULE_06,
+  "07-valuation-methods": MODULE_07,
+  "08-sector-analysis": MODULE_08,
+  "09-annual-reports": MODULE_09,
+  "10-support-resistance": MODULE_10,
+  "11-chart-patterns": MODULE_11,
+  "12-technical-indicators": MODULE_12,
+  "13-candlestick-patterns": MODULE_13,
 };
 
 export const COURSES = [
@@ -128,7 +144,7 @@ export const COURSES = [
     description: "Decode balance sheets, income statements, and cash flow statements. Learn to identify revenue quality, debt levels, profitability ratios, and red flags in company financials.",
     icon: "📋", level: "Beginner", lessons: 10, duration: "5 hrs",
     thumb: "linear-gradient(135deg, #1e3a5f 0%, #3b82f6 100%)",
-    modules: [{ id: "m1", title: "The Three Financial Statements", lessons: [
+    modules: DETAILED_MODULES["06-financial-statements"] || [],
       { id: "l1", title: "Income Statement Decoded", type: "article", duration: "15 min", content: [{ type: "paragraph", text: "Revenue → Gross Profit → Operating Profit → Net Profit. Each level tells a different story." }] },
       { id: "l2", title: "Balance Sheet Deep Dive", type: "article", duration: "15 min", content: [{ type: "paragraph", text: "Assets = Liabilities + Equity. This equation always balances." }] },
       { id: "l3", title: "Cash Flow Statement", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Profit is an opinion, cash is a fact. Follow the money." }] },
@@ -140,7 +156,7 @@ export const COURSES = [
     description: "Master P/E, P/B, EV/EBITDA, PEG ratio, DCF (Discounted Cash Flow) analysis, and relative valuation. Learn when each method is appropriate and how to calculate intrinsic value.",
     icon: "🧮", level: "Intermediate", lessons: 10, duration: "5 hrs",
     thumb: "linear-gradient(135deg, #1e40af 0%, #60a5fa 100%)",
-    modules: [{ id: "m1", title: "Valuation Ratios", lessons: [
+    modules: DETAILED_MODULES["07-valuation-methods"] || [],
       { id: "l1", title: "P/E Ratio — The Most Popular Metric", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "P/E tells you how much investors pay for each rupee of earnings. Compare within sectors." }] },
       { id: "l2", title: "EV/EBITDA & DCF Analysis", type: "article", duration: "16 min", content: [{ type: "paragraph", text: "EV/EBITDA removes capital structure bias. DCF is theoretically the most correct valuation method." }] },
     ], quiz: { id: "q1", questions: [{ q: "PEG below 1 suggests:", options: ["Overvalued", "Undervalued relative to growth", "No growth", "High debt"], answer: 1 }] }}],
@@ -151,7 +167,7 @@ export const COURSES = [
     description: "Framework for analyzing different sectors — banking, IT, pharma, FMCG, metals, auto, and real estate. Understand sector rotation, cyclical vs defensive sectors, and macro drivers.",
     icon: "🏭", level: "Intermediate", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)",
-    modules: [{ id: "m1", title: "Sector-Wise Analysis", lessons: [
+    modules: DETAILED_MODULES["08-sector-analysis"] || [],
       { id: "l1", title: "Banking — NPA, NIM, CASA", type: "article", duration: "15 min", content: [{ type: "paragraph", text: "Banking analysis requires sector-specific metrics not used elsewhere." }] },
     ], quiz: { id: "q1", questions: [{ q: "NPA stands for:", options: ["Net Profit Analysis", "Non-Performing Assets", "National Payment Authority", "New Profit Allocation"], answer: 1 }] }}],
   },
@@ -161,7 +177,7 @@ export const COURSES = [
     description: "How to extract actionable insights from annual reports — management discussion, auditor notes, related party transactions, contingent liabilities, and corporate governance indicators.",
     icon: "📖", level: "Intermediate", lessons: 6, duration: "3 hrs",
     thumb: "linear-gradient(135deg, #312e81 0%, #6366f1 100%)",
-    modules: [{ id: "m1", title: "Reading Annual Reports", lessons: [
+    modules: DETAILED_MODULES["09-annual-reports"] || [],
       { id: "l1", title: "Key Sections to Focus On", type: "article", duration: "15 min", content: [{ type: "paragraph", text: "Chairman's letter, MD&A, financial statements, notes to accounts, and auditor's report." }] },
     ], quiz: { id: "q1", questions: [{ q: "The most important section for hidden risks is:", options: ["Cover page", "Notes to Accounts", "Photos", "Index"], answer: 1 }] }}],
   },
@@ -173,7 +189,7 @@ export const COURSES = [
     description: "Identify key support and resistance levels, draw accurate trend lines, understand trend channels, and learn breakout vs breakdown dynamics with real NSE chart examples.",
     icon: "📐", level: "Beginner", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #78350f 0%, #d97706 100%)",
-    modules: [{ id: "m1", title: "S/R & Trends", lessons: [
+    modules: DETAILED_MODULES["10-support-resistance"] || [],
       { id: "l1", title: "Support — The Floor", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Support is where buying pressure prevents further decline. When it breaks, it becomes resistance." }] },
     ], quiz: { id: "q1", questions: [{ q: "When support breaks it becomes:", options: ["Stronger support", "Resistance", "Irrelevant", "A gap"], answer: 1 }] }}],
   },
@@ -183,7 +199,7 @@ export const COURSES = [
     description: "Comprehensive study of reversal and continuation patterns — Head & Shoulders, Double Top/Bottom, Cup & Handle, Flags, Pennants, Wedges, and Triangles with entry/exit rules.",
     icon: "📊", level: "Intermediate", lessons: 12, duration: "6 hrs",
     thumb: "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)",
-    modules: [{ id: "m1", title: "Chart Pattern Recognition", lessons: [
+    modules: DETAILED_MODULES["11-chart-patterns"] || [],
       { id: "l1", title: "Head & Shoulders", type: "article", duration: "16 min", content: [{ type: "paragraph", text: "The most reliable reversal pattern. Three peaks with the middle being highest." }] },
     ], quiz: { id: "q1", questions: [{ q: "H&S is confirmed when:", options: ["Right shoulder forms", "Head is highest", "Neckline breaks", "Volume spikes"], answer: 2 }] }}],
   },
@@ -193,7 +209,7 @@ export const COURSES = [
     description: "Master RSI, MACD, Bollinger Bands, Moving Averages (SMA, EMA), Stochastic, ADX, and Supertrend. Learn indicator combinations, divergences, and avoiding false signals.",
     icon: "📈", level: "Intermediate", lessons: 14, duration: "7 hrs",
     thumb: "linear-gradient(135deg, #78350f 0%, #ea580c 100%)",
-    modules: [{ id: "m1", title: "Key Indicators", lessons: [
+    modules: DETAILED_MODULES["12-technical-indicators"] || [],
       { id: "l1", title: "RSI — Relative Strength Index", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "RSI measures momentum on a 0-100 scale. Above 70 = overbought, below 30 = oversold." }] },
     ], quiz: { id: "q1", questions: [{ q: "RSI above 70 indicates:", options: ["Oversold", "Overbought", "Neutral", "Bullish reversal"], answer: 1 }] }}],
   },
@@ -203,7 +219,7 @@ export const COURSES = [
     description: "Identify and trade 20+ candlestick patterns — Doji, Hammer, Engulfing, Morning/Evening Star, Harami, Marubozu, Three White Soldiers, and multi-candle formations.",
     icon: "🕯", level: "Intermediate", lessons: 10, duration: "5 hrs",
     thumb: "linear-gradient(135deg, #9a3412 0%, #f97316 100%)",
-    modules: [{ id: "m1", title: "Candlestick Patterns", lessons: [
+    modules: DETAILED_MODULES["13-candlestick-patterns"] || [],
       { id: "l1", title: "Single Candle Patterns", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Hammer, Shooting Star, Doji, and Marubozu — each tells a story about buyer/seller strength." }] },
     ], quiz: { id: "q1", questions: [{ q: "A Doji indicates:", options: ["Strong buying", "Strong selling", "Indecision", "Gap up"], answer: 2 }] }}],
   },
