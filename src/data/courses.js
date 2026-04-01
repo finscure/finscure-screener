@@ -62,6 +62,16 @@ export const SECTIONS = [
   },
 ];
 
+// Import detailed module content (populated modules)
+import { MODULE_01 } from "./modules/module_01";
+import { MODULE_02 } from "./modules/module_02";
+
+// Map of courseId → detailed modules (add more as content is created)
+const DETAILED_MODULES = {
+  "01-getting-started": MODULE_01,
+  "02-stock-exchanges": MODULE_02,
+};
+
 export const COURSES = [
   // ═══════════ FOUNDATION (5 modules) ═══════════
   {
@@ -70,18 +80,7 @@ export const COURSES = [
     description: "Understand what stocks are, how exchanges function, key market participants (retail, institutional, FIIs, DIIs), trading sessions, and essential terminology every investor must know.",
     icon: "📊", level: "Beginner", lessons: 8, duration: "3 hrs",
     thumb: "linear-gradient(135deg, #065f46 0%, #10965a 100%)",
-    modules: [
-      { id: "m1", title: "Introduction to Stocks", lessons: [
-        { id: "l1", title: "What is a Stock?", type: "article", duration: "12 min", content: [{ type: "heading", text: "Understanding Stocks" }, { type: "paragraph", text: "A stock represents a unit of ownership in a company. When you buy shares of Reliance Industries, you become a part-owner of that business." }, { type: "callout", text: "Key Takeaway: Stocks = ownership. You profit through price appreciation or dividends." }] },
-        { id: "l2", title: "How Stock Exchanges Work", type: "article", duration: "10 min", content: [{ type: "paragraph", text: "NSE and BSE are India's two major exchanges where stocks are bought and sold electronically." }] },
-        { id: "l3", title: "Market Participants — Retail, FII, DII", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "The market has retail investors, foreign institutional investors (FIIs), domestic institutional investors (DIIs), and HNIs." }] },
-        { id: "l4", title: "Trading Sessions & Market Timings", type: "article", duration: "10 min", content: [{ type: "paragraph", text: "NSE operates from 9:15 AM to 3:30 PM IST with pre-open and post-close sessions." }] },
-      ], quiz: { id: "q1", questions: [
-        { q: "What does a stock represent?", options: ["A loan", "Ownership in a company", "A bond", "A deposit"], answer: 1 },
-        { q: "FII stands for:", options: ["Fixed Income Investors", "Foreign Institutional Investors", "Federal Indian Investments", "Financial Investors"], answer: 1 },
-        { q: "NSE normal trading starts at:", options: ["9:00 AM", "9:15 AM", "10:00 AM", "9:30 AM"], answer: 1 },
-      ]}},
-    ],
+    modules: DETAILED_MODULES["01-getting-started"] || [],
   },
   {
     id: "02-stock-exchanges", num: "02", section: "foundation",
@@ -89,11 +88,7 @@ export const COURSES = [
     description: "Deep dive into NSE and BSE infrastructure, order matching engines, clearing and settlement (T+1), depositories (CDSL, NSDL), demat accounts, and the role of SEBI in market regulation.",
     icon: "🏛", level: "Beginner", lessons: 6, duration: "2.5 hrs",
     thumb: "linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)",
-    modules: [{ id: "m1", title: "Exchange Infrastructure", lessons: [
-      { id: "l1", title: "NSE vs BSE — Architecture", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "India's two exchanges serve different roles. NSE dominates volume while BSE has historical significance." }] },
-      { id: "l2", title: "Order Matching & Settlement (T+1)", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "India moved to T+1 settlement in 2023 — among the fastest in the world." }] },
-      { id: "l3", title: "SEBI & Market Regulation", type: "article", duration: "10 min", content: [{ type: "paragraph", text: "SEBI protects investor interests and regulates all market participants." }] },
-    ], quiz: { id: "q1", questions: [{ q: "T+1 settlement means:", options: ["Trade in 1 second", "Settlement next business day", "1% bonus", "Trading at 1 PM"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["02-stock-exchanges"] || [],
   },
   {
     id: "03-candlestick-charts", num: "03", section: "foundation",
