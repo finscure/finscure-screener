@@ -76,8 +76,24 @@ import { MODULE_10 } from "./modules/module_10";
 import { MODULE_11 } from "./modules/module_11";
 import { MODULE_12 } from "./modules/module_12";
 import { MODULE_13 } from "./modules/module_13";
+import { MODULE_14 } from "./modules/module_14";
+import { MODULE_15 } from "./modules/module_15";
+import { MODULE_16 } from "./modules/module_16";
+import { MODULE_17 } from "./modules/module_17";
+import { MODULE_18 } from "./modules/module_18";
+import { MODULE_19 } from "./modules/module_19";
+import { MODULE_20 } from "./modules/module_20";
+import { MODULE_21 } from "./modules/module_21";
+import { MODULE_22 } from "./modules/module_22";
+import { MODULE_23 } from "./modules/module_23";
+import { MODULE_24 } from "./modules/module_24";
+import { MODULE_25 } from "./modules/module_25";
+import { MODULE_26 } from "./modules/module_26";
+import { MODULE_27 } from "./modules/module_27";
+import { MODULE_28 } from "./modules/module_28";
+import { MODULE_29 } from "./modules/module_29";
+import { MODULE_30 } from "./modules/module_30";
 
-// Map of courseId → detailed modules (add more as content is created)
 const DETAILED_MODULES = {
   "01-getting-started": MODULE_01,
   "02-stock-exchanges": MODULE_02,
@@ -92,6 +108,23 @@ const DETAILED_MODULES = {
   "11-chart-patterns": MODULE_11,
   "12-technical-indicators": MODULE_12,
   "13-candlestick-patterns": MODULE_13,
+  "14-institutional-trading": MODULE_14,
+  "15-order-blocks-fvg": MODULE_15,
+  "16-liquidity-market-structure": MODULE_16,
+  "17-demand-supply-zones": MODULE_17,
+  "18-futures-trading": MODULE_18,
+  "19-options-greeks": MODULE_19,
+  "20-options-strategies": MODULE_20,
+  "21-open-interest-pcr": MODULE_21,
+  "22-commodity-trading": MODULE_22,
+  "23-forex-global": MODULE_23,
+  "24-risk-management": MODULE_24,
+  "25-trading-psychology": MODULE_25,
+  "26-trade-journaling": MODULE_26,
+  "27-algo-trading": MODULE_27,
+  "28-backtesting": MODULE_28,
+  "29-trading-system": MODULE_29,
+  "30-portfolio-construction": MODULE_30,
 };
 
 export const COURSES = [
@@ -212,9 +245,7 @@ export const COURSES = [
     description: "Understand how institutional traders (FIIs, mutual funds, hedge funds) operate differently from retail traders. Learn about order flow, block deals, bulk deals, and institutional footprints.",
     icon: "🏦", level: "Intermediate", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%)",
-    modules: [{ id: "m1", title: "Institutional Behavior", lessons: [
-      { id: "l1", title: "How Institutions Trade", type: "article", duration: "15 min", content: [{ type: "paragraph", text: "Institutions can't enter or exit positions like retail. They must accumulate and distribute over days/weeks." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Block deals happen:", options: ["After hours", "In minimum 5L shares at agreed price", "Only on BSE", "Monthly"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["14-institutional-trading"] || [],
   },
   {
     id: "15-order-blocks-fvg", num: "15", section: "smart-money",
@@ -222,9 +253,7 @@ export const COURSES = [
     description: "Deep dive into order block identification, bullish and bearish order blocks, fair value gaps (FVG), imbalances, and how to use them for high-probability trade entries.",
     icon: "🧱", level: "Advanced", lessons: 10, duration: "5 hrs",
     thumb: "linear-gradient(135deg, #581c87 0%, #a855f7 100%)",
-    modules: [{ id: "m1", title: "Order Blocks", lessons: [
-      { id: "l1", title: "What is an Order Block?", type: "article", duration: "16 min", content: [{ type: "paragraph", text: "Order blocks are zones where institutional orders were placed, creating supply/demand imbalances." }] },
-    ], quiz: { id: "q1", questions: [{ q: "An order block represents:", options: ["Random noise", "Institutional order zones", "Retail activity", "Circuit limits"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["15-order-blocks-fvg"] || [],
   },
   {
     id: "16-liquidity-market-structure", num: "16", section: "smart-money",
@@ -232,9 +261,7 @@ export const COURSES = [
     description: "Master liquidity concepts — buy-side and sell-side liquidity, liquidity sweeps, inducements, stop hunts, and how market makers engineer price movements to trap retail traders.",
     icon: "💧", level: "Advanced", lessons: 10, duration: "6 hrs",
     thumb: "linear-gradient(135deg, #701a75 0%, #d946ef 100%)",
-    modules: [{ id: "m1", title: "Liquidity Concepts", lessons: [
-      { id: "l1", title: "Buy-Side vs Sell-Side Liquidity", type: "article", duration: "16 min", content: [{ type: "paragraph", text: "Liquidity rests above highs (buy stops) and below lows (sell stops). Institutions hunt these levels." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Stop hunts target:", options: ["Support levels only", "Retail stop-loss clusters", "Institutional orders", "Circuit breakers"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["16-liquidity-market-structure"] || [],
   },
   {
     id: "17-demand-supply-zones", num: "17", section: "smart-money",
@@ -242,9 +269,7 @@ export const COURSES = [
     description: "Identify institutional demand and supply zones, distinguish them from basic support/resistance, learn zone freshness, proximal vs distal lines, and trade management within zones.",
     icon: "📦", level: "Advanced", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
-    modules: [{ id: "m1", title: "D&S Zones", lessons: [
-      { id: "l1", title: "Demand Zones vs Support", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Demand zones are areas of institutional buying. Unlike support, they are one-time-use zones." }] },
-    ], quiz: { id: "q1", questions: [{ q: "A fresh demand zone is:", options: ["Tested 5 times", "Never retested since formation", "Always at round numbers", "Only on daily charts"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["17-demand-supply-zones"] || [],
   },
 
   // ═══════════ DERIVATIVES (4 modules) ═══════════
@@ -254,9 +279,7 @@ export const COURSES = [
     description: "Understand futures contracts, margins (initial, maintenance, MTM), lot sizes, expiry cycles, basis and contango, pair trading, and naked futures strategies on NSE.",
     icon: "📜", level: "Intermediate", lessons: 10, duration: "5 hrs",
     thumb: "linear-gradient(135deg, #7f1d1d 0%, #ef4444 100%)",
-    modules: [{ id: "m1", title: "Futures Basics", lessons: [
-      { id: "l1", title: "What is a Futures Contract?", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Futures are standardized contracts to buy/sell an asset at a predetermined price on a future date." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Futures expire on:", options: ["First Thursday", "Last Thursday", "Last Friday", "Any day"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["18-futures-trading"] || [],
   },
   {
     id: "19-options-greeks", num: "19", section: "derivatives",
@@ -264,9 +287,7 @@ export const COURSES = [
     description: "Master Delta, Gamma, Theta, Vega, and Rho. Learn to read and interpret the NSE option chain, identify max pain, and understand implied volatility and its impact on premiums.",
     icon: "🔬", level: "Intermediate", lessons: 12, duration: "6 hrs",
     thumb: "linear-gradient(135deg, #991b1b 0%, #f87171 100%)",
-    modules: [{ id: "m1", title: "The Greeks", lessons: [
-      { id: "l1", title: "Delta & Gamma", type: "article", duration: "16 min", content: [{ type: "paragraph", text: "Delta measures sensitivity to price. Gamma measures the rate of change of delta." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Theta measures:", options: ["Price sensitivity", "Time decay", "Volatility impact", "Interest rate"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["19-options-greeks"] || [],
   },
   {
     id: "20-options-strategies", num: "20", section: "derivatives",
@@ -274,9 +295,7 @@ export const COURSES = [
     description: "Learn Bull Call Spread, Bear Put Spread, Straddle, Strangle, Iron Condor, Butterfly, Covered Call, and Protective Put. Includes payoff diagrams and breakeven analysis.",
     icon: "🎯", level: "Advanced", lessons: 15, duration: "8 hrs",
     thumb: "linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)",
-    modules: [{ id: "m1", title: "Options Strategies", lessons: [
-      { id: "l1", title: "Bull Call Spread", type: "article", duration: "16 min", content: [{ type: "paragraph", text: "Buy a call at a lower strike and sell a call at a higher strike. Limited risk, limited reward." }] },
-    ], quiz: { id: "q1", questions: [{ q: "An Iron Condor combines:", options: ["Only calls", "Only puts", "Both bull put spread and bear call spread", "Only buying"], answer: 2 }] }}],
+    modules: DETAILED_MODULES["20-options-strategies"] || [],
   },
   {
     id: "21-open-interest-pcr", num: "21", section: "derivatives",
@@ -284,9 +303,7 @@ export const COURSES = [
     description: "Decode OI buildup (long/short), OI unwinding, Put-Call Ratio interpretation, change in OI vs price analysis, and how to track institutional positioning through derivatives data.",
     icon: "🔢", level: "Advanced", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #991b1b 0%, #ef4444 100%)",
-    modules: [{ id: "m1", title: "OI Analysis", lessons: [
-      { id: "l1", title: "Reading Open Interest", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Rising OI + Rising Price = Long Buildup. Rising OI + Falling Price = Short Buildup." }] },
-    ], quiz: { id: "q1", questions: [{ q: "PCR > 1 generally indicates:", options: ["Bearish", "Bullish sentiment", "Neutral", "Low volume"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["21-open-interest-pcr"] || [],
   },
 
   // ═══════════ MULTI-ASSET TRADING (2 modules) ═══════════
@@ -296,9 +313,7 @@ export const COURSES = [
     description: "Introduction to MCX commodity markets — gold, silver, crude oil, natural gas. Understand contract specifications, margin requirements, global price drivers, and India-specific factors.",
     icon: "🪙", level: "Intermediate", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #78350f 0%, #d97706 100%)",
-    modules: [{ id: "m1", title: "Commodities", lessons: [
-      { id: "l1", title: "Gold & Silver Trading", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Gold is a safe-haven asset. Its price is driven by USD strength, inflation, and geopolitical risk." }] },
-    ], quiz: { id: "q1", questions: [{ q: "MCX trades in:", options: ["Stocks only", "Commodities", "Currency only", "Mutual funds"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["22-commodity-trading"] || [],
   },
   {
     id: "23-forex-global", num: "23", section: "multi-asset",
@@ -306,9 +321,7 @@ export const COURSES = [
     description: "Understand currency pairs, USD/INR dynamics, RBI intervention, forex correlation with equity markets, global indices (S&P 500, Nasdaq, Nikkei), and inter-market analysis.",
     icon: "🌐", level: "Intermediate", lessons: 7, duration: "3.5 hrs",
     thumb: "linear-gradient(135deg, #854d0e 0%, #f59e0b 100%)",
-    modules: [{ id: "m1", title: "Forex Basics", lessons: [
-      { id: "l1", title: "USD/INR Dynamics", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "Rupee depreciation benefits IT exporters but hurts oil importers. RBI actively manages the rate." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Rupee depreciation benefits:", options: ["Importers", "IT exporters", "Both equally", "Neither"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["23-forex-global"] || [],
   },
 
   // ═══════════ RISK & PSYCHOLOGY (3 modules) ═══════════
@@ -318,9 +331,7 @@ export const COURSES = [
     description: "Master the art of capital preservation — R-multiples, fixed-fractional position sizing, Kelly Criterion basics, drawdown management, portfolio heat, and correlation-aware risk allocation.",
     icon: "🛡️", level: "Intermediate", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #065f46 0%, #10b981 100%)",
-    modules: [{ id: "m1", title: "Position Sizing", lessons: [
-      { id: "l1", title: "The 2% Rule", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "Never risk more than 2% of your portfolio on a single trade. This ensures survival through losing streaks." }] },
-    ], quiz: { id: "q1", questions: [{ q: "The 2% rule means:", options: ["2% of stock price", "2% of portfolio per trade", "2% annual return", "2% brokerage"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["24-risk-management"] || [],
   },
   {
     id: "25-trading-psychology", num: "25", section: "risk-psychology",
@@ -328,9 +339,7 @@ export const COURSES = [
     description: "Overcome fear, greed, revenge trading, and FOMO. Learn cognitive biases (confirmation, anchoring, recency), develop a pre-market routine, and build emotional resilience.",
     icon: "🧠", level: "All Levels", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #047857 0%, #34d399 100%)",
-    modules: [{ id: "m1", title: "Emotional Mastery", lessons: [
-      { id: "l1", title: "Fear, Greed & FOMO", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "The best time to buy is when everyone is fearful. The best time to be cautious is when everyone is greedy." }] },
-    ], quiz: { id: "q1", questions: [{ q: "FOMO stands for:", options: ["Fundamental Operations", "Fear of Missing Out", "Finance Options", "Fixed Order"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["25-trading-psychology"] || [],
   },
   {
     id: "26-trade-journaling", num: "26", section: "risk-psychology",
@@ -338,9 +347,7 @@ export const COURSES = [
     description: "Build a systematic trade journal — tracking entries, exits, R-multiples, win rate, expectancy, profit factor, and maximum drawdown. Learn to identify and fix recurring mistakes.",
     icon: "📓", level: "All Levels", lessons: 6, duration: "3 hrs",
     thumb: "linear-gradient(135deg, #065f46 0%, #059669 100%)",
-    modules: [{ id: "m1", title: "Journaling System", lessons: [
-      { id: "l1", title: "What to Track in Every Trade", type: "article", duration: "12 min", content: [{ type: "paragraph", text: "Entry, exit, stop-loss, reason, chart screenshot, and emotional state. Review monthly." }] },
-    ], quiz: { id: "q1", questions: [{ q: "A trade journal helps:", options: ["Predict markets", "Identify recurring mistakes", "Guarantee profits", "Avoid taxes"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["26-trade-journaling"] || [],
   },
 
   // ═══════════ ADVANCED & QUANTITATIVE (4 modules) ═══════════
@@ -350,9 +357,7 @@ export const COURSES = [
     description: "Build, backtest, and deploy your own trading algorithms using Python. Covers data fetching, strategy coding, backtesting frameworks (Backtrader), and paper trading automation.",
     icon: "🐍", level: "Advanced", lessons: 22, duration: "18 hrs",
     thumb: "linear-gradient(135deg, #1e3a5f 0%, #3b82f6 100%)",
-    modules: [{ id: "m1", title: "Python for Trading", lessons: [
-      { id: "l1", title: "Setting Up Your Environment", type: "article", duration: "15 min", content: [{ type: "paragraph", text: "Install Python, Jupyter, and key libraries: pandas, numpy, matplotlib, yfinance, and backtrader." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Backtrader is used for:", options: ["Web development", "Strategy backtesting", "Mobile apps", "Database management"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["27-algo-trading"] || [],
   },
   {
     id: "28-backtesting", num: "28", section: "advanced-quant",
@@ -360,9 +365,7 @@ export const COURSES = [
     description: "Learn to rigorously backtest any trading strategy — avoid overfitting, survivorship bias, look-ahead bias. Understand walk-forward analysis, Monte Carlo simulation, and out-of-sample testing.",
     icon: "⏪", level: "Advanced", lessons: 8, duration: "5 hrs",
     thumb: "linear-gradient(135deg, #1e40af 0%, #818cf8 100%)",
-    modules: [{ id: "m1", title: "Backtesting", lessons: [
-      { id: "l1", title: "Avoiding Overfitting", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "A strategy that works perfectly on past data but fails live is overfitted. Use out-of-sample testing." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Overfitting means:", options: ["Strategy works too well on live data", "Strategy is curve-fitted to past data", "Strategy has too few rules", "Strategy uses no indicators"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["28-backtesting"] || [],
   },
   {
     id: "29-trading-system", num: "29", section: "advanced-quant",
@@ -370,9 +373,7 @@ export const COURSES = [
     description: "Combine technical, fundamental, and quantitative elements into a complete, rule-based trading system. Define entry/exit criteria, risk parameters, and performance benchmarks.",
     icon: "⚙️", level: "Advanced", lessons: 8, duration: "5 hrs",
     thumb: "linear-gradient(135deg, #312e81 0%, #6366f1 100%)",
-    modules: [{ id: "m1", title: "System Design", lessons: [
-      { id: "l1", title: "From Theory to System", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "A trading system removes emotion. Define exact rules for entry, exit, position size, and risk." }] },
-    ], quiz: { id: "q1", questions: [{ q: "A trading system needs:", options: ["Only gut feeling", "Clear rules for entry, exit, and risk", "Only technical indicators", "Only fundamental analysis"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["29-trading-system"] || [],
   },
   {
     id: "30-portfolio-construction", num: "30", section: "advanced-quant",
@@ -380,8 +381,6 @@ export const COURSES = [
     description: "Modern Portfolio Theory basics, diversification across asset classes, rebalancing strategies, core-satellite approach, and building a long-term wealth creation portfolio for Indian investors.",
     icon: "🏗️", level: "Intermediate", lessons: 8, duration: "4 hrs",
     thumb: "linear-gradient(135deg, #1e3a5f 0%, #60a5fa 100%)",
-    modules: [{ id: "m1", title: "Portfolio Theory", lessons: [
-      { id: "l1", title: "Diversification — The Only Free Lunch", type: "article", duration: "14 min", content: [{ type: "paragraph", text: "Don't put all eggs in one basket. Spread across sectors, asset classes, and timeframes." }] },
-    ], quiz: { id: "q1", questions: [{ q: "Core-satellite approach means:", options: ["Only index funds", "Core index + satellite active picks", "Only active picks", "Only bonds"], answer: 1 }] }}],
+    modules: DETAILED_MODULES["30-portfolio-construction"] || [],
   },
 ];
