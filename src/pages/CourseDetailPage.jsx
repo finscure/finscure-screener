@@ -192,10 +192,12 @@ function LessonAssessment({ assessment, onPass }) {
 
 // ═══ MAIN COURSE DETAIL PAGE ═══
 export default function CourseDetailPage({ courseId, onBack }) {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const course = COURSES.find(c => c.id === courseId);
   const [activeLesson, setActiveLesson] = useState(null);
   const [completedLessons, setCompletedLessons] = useState([]);
+
+  const interfaceStage = userProfile?.interface_stage || 1;
 
   useEffect(() => {
     if (!user || !courseId) return;
@@ -225,6 +227,29 @@ export default function CourseDetailPage({ courseId, onBack }) {
       <button onClick={onBack} className="btn-primary" style={{ marginTop: 16, padding: "10px 24px" }}>← Back to Courses</button>
     </div>
   );
+
+  // Access gate — check if user can access this module
+  const moduleNum = parseInt(course.num);
+  const isAccessible = (interfaceStage >= 4) ||
+    (interfaceStage >= 3 && moduleNum <= 17) ||
+    (interfaceStage >= 2 && moduleNum <= 7) ||
+    (interfaceStage >= 1 && moduleNum <= 3);
+
+  if (!isAccessible) {
+    const isPro = moduleNum > 7;
+    return (
+      <div style={{ textAlign: "center", padding: 60 }}>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
+        <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Module {course.num} is Locked</div>
+        <div style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 24, maxWidth: 400, margin: "0 auto 24px", lineHeight: 1.6 }}>
+          {isPro
+            ? "This module requires a Pro subscription. Upgrade to unlock advanced content, full screener, and more tools."
+            : "Complete earlier modules and mock trades to unlock this content. Keep learning!"}
+        </div>
+        <button onClick={onBack} className="btn-primary" style={{ padding: "12px 28px" }}>← Back to Courses</button>
+      </div>
+    );
+  }
 
   const lc = LEVEL_STYLES[course.level] || LEVEL_STYLES.Beginner;
   const allLessons = course.modules?.flatMap(m => m.lessons || []) || [];
