@@ -215,10 +215,10 @@ function AppContent() {
   const stage = userProfile?.interface_stage || 1;
 
   function renderPage() {
-    if (activePage === "courses" && activeCourse) {
+    // Course detail view — works from both "learn" and "courses" pages
+    if ((activePage === "courses" || activePage === "learn") && activeCourse) {
       return <CourseDetailPage courseId={activeCourse} onBack={() => setActiveCourse(null)} />;
     }
-    // "learn" is the courses page (renamed for Stage 1/2 users)
     if (activePage === "learn") return <CoursesPage onOpenCourse={openCourse} />;
 
     switch (activePage) {
