@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finscure — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+[data-theme="dark"]{
+  --bg:#07090f;--bg2:#0d1117;--bg3:#151b27;--bg4:#1a2235;--surf:#1e293b;
+  --bdr:rgba(255,255,255,0.06);--bdr2:rgba(255,255,255,0.1);
+  --txt:#f1f5f9;--txt2:#94a3b8;--txt3:#64748b;
+  --grn:#63dca0;--grn-d:rgba(99,220,160,0.12);
+  --red:#f87171;--red-d:rgba(248,113,113,0.1);
+  --blu:#60a5fa;--blu-d:rgba(96,165,250,0.1);
+  --amb:#fbbf24;--amb-d:rgba(251,191,36,0.1);
+  --pur:#a78bfa;--pur-d:rgba(167,139,250,0.1);
+  --cyn:#22d3ee;--cyn-d:rgba(34,211,238,0.1);
+  --nav-bg:rgba(7,9,15,0.92);
+  --g-grn:linear-gradient(135deg,#63dca0,#34d399);
+  --g-blu:linear-gradient(135deg,#60a5fa,#818cf8);
+  --g-pur:linear-gradient(135deg,#a78bfa,#8b5cf6);
+  --shadow:0 8px 32px rgba(0,0,0,0.3);
+  --btn-t:#07090f;--inp-bg:#0d1117;
+}
+[data-theme="light"]{
+  --bg:#f5f6fa;--bg2:#ffffff;--bg3:#ffffff;--bg4:#f0f2f5;--surf:#e8ecf1;
+  --bdr:rgba(0,0,0,0.07);--bdr2:rgba(0,0,0,0.12);
+  --txt:#111827;--txt2:#4b5563;--txt3:#9ca3af;
+  --grn:#10965a;--grn-d:rgba(16,150,90,0.08);
+  --red:#dc2626;--red-d:rgba(220,38,38,0.06);
+  --blu:#2563eb;--blu-d:rgba(37,99,235,0.06);
+  --amb:#d97706;--amb-d:rgba(217,119,6,0.06);
+  --pur:#7c3aed;--pur-d:rgba(124,58,237,0.06);
+  --cyn:#0891b2;--cyn-d:rgba(8,145,178,0.06);
+  --nav-bg:rgba(255,255,255,0.92);
+  --g-grn:linear-gradient(135deg,#10965a,#059669);
+  --g-blu:linear-gradient(135deg,#2563eb,#4f46e5);
+  --g-pur:linear-gradient(135deg,#7c3aed,#6d28d9);
+  --shadow:0 8px 32px rgba(0,0,0,0.06);
+  --btn-t:#ffffff;--inp-bg:#f5f6fa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--txt3);border-radius:3px}
+
+.admin-sidebar{position:fixed;top:0;left:0;bottom:0;width:230px;background:var(--bg2);border-right:1px solid var(--bdr);padding:20px 0;display:flex;flex-direction:column;z-index:50;overflow-y:auto}
+.admin-logo{display:flex;align-items:center;gap:10px;padding:0 20px;margin-bottom:28px}
+.admin-logo-icon{width:34px;height:34px;border-radius:9px;background:var(--g-grn);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:var(--btn-t)}
+.admin-logo-text{font-family:'Playfair Display',serif;font-size:20px;font-weight:800;letter-spacing:-.5px}
+.admin-logo-badge{font-size:9px;font-weight:700;background:var(--pur-d);color:var(--pur);padding:2px 7px;border-radius:4px;margin-left:4px;letter-spacing:.5px}
+.admin-nav-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.1px;color:var(--txt3);padding:0 20px;margin:20px 0 8px}
+.admin-nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;margin:1px 8px;border-radius:8px;font-size:13.5px;color:var(--txt2);cursor:pointer;transition:all .15s;font-weight:500}
+.admin-nav-item:hover{background:rgba(255,255,255,.04);color:var(--txt)}
+.admin-nav-item.active{background:var(--grn-d);color:var(--grn);font-weight:600}
+.admin-nav-item .nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.admin-nav-item .nav-count{margin-left:auto;font-size:11px;font-weight:600;background:var(--grn-d);color:var(--grn);padding:1px 7px;border-radius:8px}
+.sidebar-user{margin-top:auto;padding:16px 20px;border-top:1px solid var(--bdr);display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:32px;height:32px;border-radius:50%;background:var(--g-pur);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.sidebar-user-name{font-size:13px;font-weight:600}
+.sidebar-user-role{font-size:11px;color:var(--txt3)}
+
+.admin-topbar{position:fixed;top:0;left:230px;right:0;height:58px;z-index:40;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.topbar-title{font-size:17px;font-weight:700}
+.topbar-breadcrumb{font-size:12px;color:var(--txt3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--bdr);cursor:pointer;transition:all .15s;font-size:15px}
+.topbar-icon:hover{border-color:var(--grn);background:var(--grn-d)}
+.theme-sw{position:relative;width:48px;height:26px;background:var(--surf);border-radius:13px;cursor:pointer;border:1px solid var(--bdr);transition:all .3s;flex-shrink:0}
+.theme-sw .sw-dot{width:20px;height:20px;border-radius:50%;background:var(--g-grn);position:absolute;top:2px;left:2px;transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 2px 6px rgba(0,0,0,.15)}
+[data-theme="light"] .theme-sw .sw-dot{transform:translateX(22px)}
+.theme-sw .sw-i{position:absolute;font-size:11px;top:50%;transform:translateY(-50%);transition:opacity .3s}
+.theme-sw .sw-sun{left:5px;opacity:.35}.theme-sw .sw-moon{right:5px;opacity:.35}
+[data-theme="dark"] .sw-moon{opacity:1}[data-theme="light"] .sw-sun{opacity:1}
+
+.admin-main{margin-left:230px;padding:78px 28px 28px;max-width:calc(100vw - 230px);overflow-x:hidden}
+.adm-page{display:none}.adm-page.visible{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.adm-grid{display:grid;gap:16px;margin-bottom:24px}
+.adm-grid-4{grid-template-columns:repeat(4,1fr)}.adm-grid-3{grid-template-columns:repeat(3,1fr)}
+.adm-grid-2{grid-template-columns:repeat(2,1fr)}.adm-grid-2-1{grid-template-columns:1.4fr 1fr}
+.adm-card{background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:20px;transition:all .2s;min-width:0;overflow:hidden}
+.adm-card:hover{border-color:var(--bdr2)}
+.adm-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.adm-card-title{font-size:15px;font-weight:700}.adm-card-subtitle{font-size:12px;color:var(--txt3);margin-top:2px}
+.adm-card-action{font-size:12px;font-weight:600;color:var(--grn);cursor:pointer}
+.kpi-card{text-align:left}.kpi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.kpi-change{font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px}
+.kpi-change.up{background:var(--grn-d);color:var(--grn)}.kpi-change.down{background:var(--red-d);color:var(--red)}
+.kpi-val{font-size:26px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.kpi-label{font-size:12px;color:var(--txt2)}
+.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.sec-title{font-size:18px;font-weight:700}.sec-sub{font-size:12px;color:var(--txt3);margin-top:2px}
+.adm-table-wrap{background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;overflow-x:auto}
+.adm-table{width:100%;border-collapse:collapse;min-width:650px}
+.adm-table thead th{text-align:left;padding:11px 16px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--txt3);background:var(--bg2);border-bottom:1px solid var(--bdr)}
+.adm-table tbody td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--bdr);transition:background .1s}
+.adm-table tbody tr:hover td{background:var(--bg4)}
+.adm-table tbody tr:last-child td{border-bottom:none}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none;font-family:'Outfit',sans-serif}
+.btn-g{background:var(--g-grn);color:var(--btn-t)}.btn-g:hover{box-shadow:0 4px 16px rgba(99,220,160,.25);transform:translateY(-1px)}
+.btn-o{background:var(--bg4);color:var(--txt);border:1px solid var(--bdr)}.btn-o:hover{border-color:var(--bdr2)}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
+.btn-danger{background:var(--red-d);color:var(--red);border:1px solid transparent}.btn-danger:hover{border-color:var(--red)}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.badge-g{background:var(--grn-d);color:var(--grn)}.badge-r{background:var(--red-d);color:var(--red)}
+.badge-b{background:var(--blu-d);color:var(--blu)}.badge-a{background:var(--amb-d);color:var(--amb)}.badge-p{background:var(--pur-d);color:var(--pur)}
+.adm-tabs{display:flex;gap:3px;margin-bottom:18px;background:var(--bg2);border-radius:9px;padding:3px;width:fit-content;border:1px solid var(--bdr)}
+.adm-tab{padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:500;color:var(--txt2);cursor:pointer;transition:all .15s;border:none;background:none;font-family:'Outfit',sans-serif}
+.adm-tab:hover{color:var(--txt)}.adm-tab.active{background:var(--bg3);color:var(--txt);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.form-group{margin-bottom:16px}.form-label{font-size:12px;font-weight:600;color:var(--txt3);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:9px 14px;background:var(--inp-bg);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:13.5px;font-family:'Outfit',sans-serif;outline:none;transition:border .2s}
+.form-input:focus{border-color:var(--grn)}.form-input::placeholder{color:var(--txt3)}
+select.form-input{cursor:pointer}textarea.form-input{resize:vertical;min-height:80px;font-family:'Outfit',sans-serif}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)}.toggle-row:last-child{border-bottom:none}
+.toggle-info{flex:1}.toggle-label{font-size:13px;font-weight:600}.toggle-desc{font-size:11.5px;color:var(--txt3);margin-top:1px}
+.toggle-switch{width:40px;height:22px;border-radius:11px;background:var(--surf);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:1px solid var(--bdr)}
+.toggle-switch.on{background:var(--grn)}
+.toggle-switch .t-dot{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.toggle-switch.on .t-dot{transform:translateX(18px)}
+.color-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid var(--bdr);position:relative;overflow:hidden}
+.color-swatch input[type="color"]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;cursor:pointer;opacity:0}
+.color-label{font-size:13px;font-weight:500;flex:1}.color-val{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--txt3)}
+.user-cell{display:flex;align-items:center;gap:9px}
+.user-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-weight:600;font-size:13px}.user-email{font-size:11px;color:var(--txt3)}
+.loading-spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--bdr);border-top:2px solid var(--grn);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:1200px){.adm-grid-4{grid-template-columns:repeat(2,1fr)}.adm-grid-3{grid-template-columns:repeat(2,1fr)}.adm-grid-2-1{grid-template-columns:1fr}}
+@media(max-width:900px){.admin-sidebar{display:none}.admin-main{margin-left:0;max-width:100vw}.admin-topbar{left:0}}
+@media(max-width:600px){.admin-main{padding:68px 14px 14px}.adm-grid-4,.adm-grid-3,.adm-grid-2{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="admin-sidebar">
+  <div class="admin-logo">
+    <div class="admin-logo-icon">F</div>
+    <div><span class="admin-logo-text">Finscure</span><span class="admin-logo-badge">ADMIN</span></div>
+  </div>
+  <div class="admin-nav-label">Overview</div>
+  <div class="admin-nav-item active" data-p="overview"><span class="nav-icon">📊</span> Dashboard</div>
+  <div class="admin-nav-item" data-p="analytics"><span class="nav-icon">📈</span> Analytics</div>
+  <div class="admin-nav-label">Manage</div>
+  <div class="admin-nav-item" data-p="users"><span class="nav-icon">👥</span> Users <span class="nav-count" id="navUserCount">—</span></div>
+  <div class="admin-nav-item" data-p="courses"><span class="nav-icon">📚</span> Courses <span class="nav-count">30</span></div>
+  <div class="admin-nav-item" data-p="news"><span class="nav-icon">📰</span> News & Content</div>
+  <div class="admin-nav-label">Customize</div>
+  <div class="admin-nav-item" data-p="appearance"><span class="nav-icon">🎨</span> Appearance</div>
+  <div class="admin-nav-item" data-p="platform"><span class="nav-icon">⚙️</span> Platform Settings</div>
+  <div class="admin-nav-item" data-p="billing"><span class="nav-icon">💳</span> Plans & Billing</div>
+  <div class="sidebar-user">
+    <div class="sidebar-avatar">AD</div>
+    <div><div class="sidebar-user-name">Admin</div><div class="sidebar-user-role">Super Admin</div></div>
+  </div>
+</aside>
+
+<!-- TOPBAR -->
+<header class="admin-topbar">
+  <div><div class="topbar-title" id="topTitle">Dashboard</div><div class="topbar-breadcrumb" id="topBreadcrumb">Overview · Live Data from Firebase</div></div>
+  <div class="topbar-right">
+    <div class="theme-sw" id="themeToggle"><span class="sw-i sw-sun">☀️</span><span class="sw-i sw-moon">🌙</span><div class="sw-dot"></div></div>
+    <div class="topbar-icon" onclick="loadAllData()" title="Refresh Data">🔄</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="admin-main">
+
+  <!-- OVERVIEW -->
+  <div class="adm-page visible" id="p-overview">
+    <div class="adm-grid adm-grid-4">
+      <div class="adm-card kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--grn-d)">👥</div></div><div class="kpi-val" id="kpiUsers"><span class="loading-spinner"></span></div><div class="kpi-label">Total Users</div></div>
+      <div class="adm-card kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--blu-d)">📈</div></div><div class="kpi-val" id="kpiActive"><span class="loading-spinner"></span></div><div class="kpi-label">Onboarded Users</div></div>
+      <div class="adm-card kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--amb-d)">💹</div></div><div class="kpi-val" id="kpiTrades"><span class="loading-spinner"></span></div><div class="kpi-label">Total Mock Trades</div></div>
+      <div class="adm-card kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--pur-d)">🎓</div></div><div class="kpi-val" id="kpiLessons"><span class="loading-spinner"></span></div><div class="kpi-label">Lessons Completed</div></div>
+    </div>
+    <div class="adm-grid adm-grid-2-1">
+      <div class="adm-card">
+        <div class="adm-card-header"><div><div class="adm-card-title">User Stage Distribution</div><div class="adm-card-subtitle">Based on interface_stage from Firestore</div></div></div>
+        <div id="stageDist" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+      <div class="adm-card">
+        <div class="adm-card-header"><div><div class="adm-card-title">Recent Signups</div><div class="adm-card-subtitle">Latest registered users</div></div><span class="adm-card-action" data-p="users">View All →</span></div>
+        <div id="recentSignups" style="display:flex;flex-direction:column;gap:2px"></div>
+      </div>
+    </div>
+    <div class="adm-grid adm-grid-3">
+      <div class="adm-card"><div class="adm-card-header"><div class="adm-card-title">Placement Distribution</div></div><div id="placementDist" style="display:flex;flex-direction:column;gap:8px"></div></div>
+      <div class="adm-card"><div class="adm-card-header"><div class="adm-card-title">Top Progress</div><div class="adm-card-subtitle">Users with most lessons completed</div></div><div id="topProgress" style="display:flex;flex-direction:column;gap:8px"></div></div>
+      <div class="adm-card"><div class="adm-card-header"><div class="adm-card-title">Quick Actions</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-g" style="width:100%;justify-content:center" data-p="users">👥 Manage Users</button>
+          <button class="btn btn-o" style="width:100%;justify-content:center" data-p="courses">📚 Manage Courses</button>
+          <button class="btn btn-o" style="width:100%;justify-content:center" data-p="platform">⚙️ Platform Settings</button>
+          <button class="btn btn-o" style="width:100%;justify-content:center" data-p="appearance">🎨 Appearance</button>
+          <button class="btn btn-o" style="width:100%;justify-content:center" data-p="billing">💳 Plans & Billing</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="adm-page" id="p-analytics">
+    <div class="sec-head"><div><div class="sec-title">Platform Analytics</div><div class="sec-sub">Live insights from Firestore</div></div></div>
+    <div class="adm-grid adm-grid-4">
+      <div class="adm-card kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--cyn-d)">🔥</div></div><div class="kpi-val" id="kpiStreaks">—</div><div class="kpi-label">Avg. Current Streak</div></div>
+      <div class="adm-card kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--grn-d)">🏆</div></div><div class="kpi-val" id="kpiLongestStreak">—</div><div class="kpi-label">Longest Streak (Any User)</div></div>
+      <div class="adm-card kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--amb-d)">💰</div></div><div class="kpi-val" id="kpiAvgPortfolio">—</div><div class="kpi-label">Avg. Portfolio Value</div></div>
+      <div class="adm-card kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--blu-d)">📊</div></div><div class="kpi-val" id="kpiAvgTrades">—</div><div class="kpi-label">Avg. Trades/User</div></div>
+    </div>
+    <div class="adm-grid adm-grid-2">
+      <div class="adm-card"><div class="adm-card-title" style="margin-bottom:14px">Stage Breakdown</div><div id="stageBreakdown"></div></div>
+      <div class="adm-card"><div class="adm-card-title" style="margin-bottom:14px">Engagement Metrics</div><div id="engagementData" style="display:flex;flex-direction:column;gap:8px"></div></div>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div class="adm-page" id="p-users">
+    <div class="sec-head"><div><div class="sec-title">User Management</div><div class="sec-sub">All registered users from Firestore</div></div><button class="btn btn-g" onclick="loadAllData()">🔄 Refresh</button></div>
+    <div class="adm-tabs" id="userTabs"><button class="adm-tab active" data-filter="all">All Users</button><button class="adm-tab" data-filter="onboarded">Onboarded</button><button class="adm-tab" data-filter="pending">Pending Onboarding</button></div>
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>User</th><th>Stage</th><th>Placement</th><th>Joined</th><th>Mock Trades</th><th>Streak</th><th>Portfolio</th></tr></thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- COURSES -->
+  <div class="adm-page" id="p-courses">
+    <div class="sec-head"><div><div class="sec-title">Course Management</div><div class="sec-sub">30 Modules · 268 Lessons · 8 Sections</div></div></div>
+    <div class="adm-tabs"><button class="adm-tab active">All Courses</button><button class="adm-tab">Beginner</button><button class="adm-tab">Intermediate</button><button class="adm-tab">Advanced</button></div>
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>#</th><th>Module</th><th>Section</th><th>Level</th><th>Lessons</th><th>Duration</th><th>Stage Required</th></tr></thead>
+        <tbody id="coursesTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="adm-page" id="p-news">
+    <div class="sec-head"><div><div class="sec-title">News & Content</div><div class="sec-sub">Content management coming soon</div></div></div>
+    <div class="adm-card" style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:12px">📰</div><div style="font-size:16px;font-weight:600;margin-bottom:6px">News Management</div><div style="font-size:13px;color:var(--txt3)">Article publishing and content moderation features will be available in the next update.</div></div>
+  </div>
+
+  <!-- APPEARANCE -->
+  <div class="adm-page" id="p-appearance">
+    <div class="sec-head"><div><div class="sec-title">Appearance & Branding</div><div class="sec-sub">Customize the look and feel</div></div><button class="btn btn-g">Save Changes</button></div>
+    <div class="adm-grid adm-grid-2">
+      <div class="adm-card">
+        <div class="adm-card-title" style="margin-bottom:16px">Brand Identity</div>
+        <div class="form-group"><label class="form-label">Platform Name</label><input class="form-input" value="Finscure"></div>
+        <div class="form-group"><label class="form-label">Tagline</label><input class="form-input" value="Learn. Practice. Trade."></div>
+        <div class="form-group"><label class="form-label">Logo Icon</label><input class="form-input" value="F" maxlength="2"></div>
+      </div>
+      <div class="adm-card">
+        <div class="adm-card-title" style="margin-bottom:16px">Color Theme</div>
+        <div class="color-row"><div class="color-swatch" style="background:#63dca0"><input type="color" value="#63dca0"></div><div class="color-label">Primary Accent</div><div class="color-val">#63DCA0</div></div>
+        <div class="color-row"><div class="color-swatch" style="background:#0a0e17"><input type="color" value="#0a0e17"></div><div class="color-label">Dark Background</div><div class="color-val">#0A0E17</div></div>
+        <div class="color-row"><div class="color-swatch" style="background:#f87171"><input type="color" value="#f87171"></div><div class="color-label">Loss / Danger</div><div class="color-val">#F87171</div></div>
+        <div class="color-row"><div class="color-swatch" style="background:#60a5fa"><input type="color" value="#60a5fa"></div><div class="color-label">Info / Blue</div><div class="color-val">#60A5FA</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLATFORM SETTINGS -->
+  <div class="adm-page" id="p-platform">
+    <div class="sec-head"><div><div class="sec-title">Platform Settings</div><div class="sec-sub">Core configuration</div></div><button class="btn btn-g">Save All</button></div>
+    <div class="adm-grid adm-grid-2">
+      <div class="adm-card">
+        <div class="adm-card-title" style="margin-bottom:16px">Mock Trading</div>
+        <div class="form-group"><label class="form-label">Stage 1 Virtual Balance</label><input class="form-input" value="₹1,00,000"></div>
+        <div class="form-group"><label class="form-label">Stage 2 Virtual Balance</label><input class="form-input" value="₹5,00,000"></div>
+        <div class="form-group"><label class="form-label">Stage 3 Virtual Balance</label><input class="form-input" value="₹10,00,000"></div>
+        <div class="form-group"><label class="form-label">Stage 4 Virtual Balance</label><input class="form-input" value="₹25,00,000"></div>
+      </div>
+      <div class="adm-card">
+        <div class="adm-card-title" style="margin-bottom:16px">Feature Toggles</div>
+        <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">Stock Screener</div><div class="toggle-desc">Allow users to access screener</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="t-dot"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">Mock Trading</div><div class="toggle-desc">Enable mock trading platform</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="t-dot"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">Placement Quiz</div><div class="toggle-desc">Require placement quiz for new users</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="t-dot"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">Leaderboard</div><div class="toggle-desc">Show public mock trading rankings</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="t-dot"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">Maintenance Mode</div><div class="toggle-desc">Take platform offline for updates</div></div><div class="toggle-switch" onclick="this.classList.toggle('on')"><div class="t-dot"></div></div></div>
+      </div>
+    </div>
+    <div class="adm-grid adm-grid-2">
+      <div class="adm-card">
+        <div class="adm-card-title" style="margin-bottom:16px">Stage Unlock Rules</div>
+        <div class="form-group"><label class="form-label">Stage 2 Unlock</label><input class="form-input" value="Module 3 + 5 mock trades"></div>
+        <div class="form-group"><label class="form-label">Stage 3 Unlock</label><input class="form-input" value="Module 7 + 20 mock trades + ₹99/mo"></div>
+        <div class="form-group"><label class="form-label">Stage 4 Unlock</label><input class="form-input" value="Module 15 + ₹199/mo"></div>
+      </div>
+      <div class="adm-card">
+        <div class="adm-card-title" style="margin-bottom:16px">Gamification</div>
+        <div class="form-group"><label class="form-label">XP per Lesson</label><input class="form-input" type="number" value="50"></div>
+        <div class="form-group"><label class="form-label">XP per Mock Trade</label><input class="form-input" type="number" value="10"></div>
+        <div class="form-group"><label class="form-label">Streak Bonus</label><select class="form-input"><option>1.5x after 7 days</option><option>2x after 7 days</option><option>Disabled</option></select></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILLING -->
+  <div class="adm-page" id="p-billing">
+    <div class="sec-head"><div><div class="sec-title">Plans & Billing</div><div class="sec-sub">Subscription plan configuration</div></div><button class="btn btn-g">Save Plans</button></div>
+    <div class="adm-grid adm-grid-3">
+      <div class="adm-card" style="border-top:3px solid var(--grn)">
+        <div style="font-size:13px;font-weight:600;color:var(--grn);margin-bottom:10px">Stage 3 — Pro</div>
+        <div class="form-group"><label class="form-label">Price (₹/month)</label><input class="form-input" value="99"></div>
+        <div class="form-group"><label class="form-label">Features</label><textarea class="form-input" style="min-height:100px">Full NSE/BSE screener
+Advanced charts with indicators
+FVM Score for all stocks
+Sector Analytics
+₹10L mock portfolio
+Community access
+Certificates</textarea></div>
+      </div>
+      <div class="adm-card" style="border-top:3px solid var(--blu)">
+        <div style="font-size:13px;font-weight:600;color:var(--blu);margin-bottom:10px">Stage 4 — Pro+</div>
+        <div class="form-group"><label class="form-label">Price (₹/month)</label><input class="form-input" value="199"></div>
+        <div class="form-group"><label class="form-label">Features</label><textarea class="form-input" style="min-height:100px">Everything in Pro
+Backtester
+F&O Derivatives module
+Strategy Builder
+Candlestick Scanner
+Query Builder
+₹25L mock portfolio
+FPL competitions</textarea></div>
+      </div>
+      <div class="adm-card" style="border-top:3px solid var(--pur)">
+        <div style="font-size:13px;font-weight:600;color:var(--pur);margin-bottom:10px">Payment Gateway</div>
+        <div class="form-group"><label class="form-label">Provider</label><select class="form-input"><option>Razorpay</option><option>Cashfree</option><option>PayU</option></select></div>
+        <div class="form-group"><label class="form-label">API Key</label><input class="form-input" type="password" placeholder="rzp_live_xxxxx"></div>
+        <div class="form-group"><label class="form-label">GST Rate (%)</label><input class="form-input" type="number" value="18"></div>
+        <div class="toggle-row" style="padding:8px 0;border:none"><div class="toggle-info"><div class="toggle-label">UPI Payments</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="t-dot"></div></div></div>
+        <div class="toggle-row" style="padding:8px 0;border:none"><div class="toggle-info"><div class="toggle-label">Card Payments</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="t-dot"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- FIREBASE SDK + LIVE DATA LOADING -->
+<!-- ═══════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ═══ PASTE YOUR FIREBASE CONFIG HERE ═══
+const firebaseConfig = {
+  apiKey: "AIzaSyCnLNoKgkXsME2U9gHVt4pFUZtv3xbMUTA",
+  authDomain: "finscure-screener.firebaseapp.com",
+  projectId: "finscure-screener",
+  storageBucket: "finscure-screener.firebasestorage.app",
+  messagingSenderId: "306981915645",
+  appId: "1:306981915645:web:1657a493dde06f5f6d6794"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ═══ COURSE DATA (static — mirrors your courses.js) ═══
+const COURSES = [
+  {num:"01",title:"Getting Started with the Stock Market",section:"Foundation",level:"Beginner",lessons:8,duration:"3 hrs",stage:1},
+  {num:"02",title:"How Stock Exchanges Work",section:"Foundation",level:"Beginner",lessons:6,duration:"2.5 hrs",stage:1},
+  {num:"03",title:"Reading Candlestick Charts",section:"Foundation",level:"Beginner",lessons:8,duration:"3 hrs",stage:1},
+  {num:"04",title:"Understanding Volume & Price Action",section:"Foundation",level:"Beginner",lessons:7,duration:"3 hrs",stage:2},
+  {num:"05",title:"Placing Orders & Order Types",section:"Foundation",level:"Beginner",lessons:5,duration:"2 hrs",stage:2},
+  {num:"06",title:"Reading Financial Statements",section:"Fundamental Analysis",level:"Beginner",lessons:10,duration:"5 hrs",stage:2},
+  {num:"07",title:"Valuation Methods & Metrics",section:"Fundamental Analysis",level:"Intermediate",lessons:10,duration:"5 hrs",stage:2},
+  {num:"08",title:"Sector & Industry Analysis",section:"Fundamental Analysis",level:"Intermediate",lessons:8,duration:"4 hrs",stage:3},
+  {num:"09",title:"Annual Report Reading",section:"Fundamental Analysis",level:"Intermediate",lessons:6,duration:"3 hrs",stage:3},
+  {num:"10",title:"Support, Resistance & Trend Lines",section:"Technical Analysis",level:"Beginner",lessons:8,duration:"4 hrs",stage:3},
+  {num:"11",title:"Chart Patterns Mastery",section:"Technical Analysis",level:"Intermediate",lessons:12,duration:"6 hrs",stage:3},
+  {num:"12",title:"Technical Indicators Deep Dive",section:"Technical Analysis",level:"Intermediate",lessons:14,duration:"7 hrs",stage:3},
+  {num:"13",title:"Candlestick Pattern Mastery",section:"Technical Analysis",level:"Intermediate",lessons:10,duration:"5 hrs",stage:3},
+  {num:"14",title:"Intro to Institutional Trading",section:"Smart Money",level:"Intermediate",lessons:8,duration:"4 hrs",stage:3},
+  {num:"15",title:"Order Blocks & Fair Value Gaps",section:"Smart Money",level:"Advanced",lessons:10,duration:"5 hrs",stage:3},
+  {num:"16",title:"Liquidity & Market Structure",section:"Smart Money",level:"Advanced",lessons:10,duration:"6 hrs",stage:3},
+  {num:"17",title:"Demand & Supply Zones",section:"Smart Money",level:"Advanced",lessons:8,duration:"4 hrs",stage:3},
+  {num:"18",title:"Futures Trading Essentials",section:"Derivatives",level:"Intermediate",lessons:10,duration:"5 hrs",stage:4},
+  {num:"19",title:"Options Greeks & Option Chain",section:"Derivatives",level:"Intermediate",lessons:12,duration:"6 hrs",stage:4},
+  {num:"20",title:"Options Trading Strategies",section:"Derivatives",level:"Advanced",lessons:15,duration:"8 hrs",stage:4},
+  {num:"21",title:"Open Interest & PCR Analysis",section:"Derivatives",level:"Advanced",lessons:8,duration:"4 hrs",stage:4},
+  {num:"22",title:"Commodity Trading",section:"Multi-Asset",level:"Intermediate",lessons:8,duration:"4 hrs",stage:4},
+  {num:"23",title:"Forex & Global Markets",section:"Multi-Asset",level:"Intermediate",lessons:7,duration:"3.5 hrs",stage:4},
+  {num:"24",title:"Risk Management & Position Sizing",section:"Risk & Psychology",level:"Intermediate",lessons:8,duration:"4 hrs",stage:3},
+  {num:"25",title:"Trading Psychology",section:"Risk & Psychology",level:"All Levels",lessons:8,duration:"4 hrs",stage:3},
+  {num:"26",title:"Trade Journaling",section:"Risk & Psychology",level:"All Levels",lessons:6,duration:"3 hrs",stage:3},
+  {num:"27",title:"Algorithmic Trading with Python",section:"Advanced & Quant",level:"Advanced",lessons:22,duration:"18 hrs",stage:4},
+  {num:"28",title:"Backtesting Strategies",section:"Advanced & Quant",level:"Advanced",lessons:8,duration:"5 hrs",stage:4},
+  {num:"29",title:"Building a Trading System",section:"Advanced & Quant",level:"Advanced",lessons:8,duration:"5 hrs",stage:4},
+  {num:"30",title:"Portfolio Construction",section:"Advanced & Quant",level:"Intermediate",lessons:8,duration:"4 hrs",stage:4},
+];
+
+// ═══ GLOBAL DATA ═══
+let allUsers = [];
+let allProgress = [];
+let allPortfolios = [];
+let allTransactions = [];
+
+// ═══ LOAD ALL DATA ═══
+window.loadAllData = async function() {
+  document.getElementById('topBreadcrumb').textContent = 'Loading data from Firebase...';
+  try {
+    const [usersSnap, progressSnap, portfolioSnap, txnSnap] = await Promise.all([
+      getDocs(collection(db, "users")),
+      getDocs(collection(db, "progress")),
+      getDocs(collection(db, "mock_portfolios")),
+      getDocs(collection(db, "mock_transactions")),
+    ]);
+
+    allUsers = []; usersSnap.forEach(d => allUsers.push({id:d.id,...d.data()}));
+    allProgress = []; progressSnap.forEach(d => allProgress.push({id:d.id,...d.data()}));
+    allPortfolios = []; portfolioSnap.forEach(d => allPortfolios.push({id:d.id,...d.data()}));
+    allTransactions = []; txnSnap.forEach(d => allTransactions.push({id:d.id,...d.data()}));
+
+    renderOverview();
+    renderUsers();
+    renderCourses();
+    renderAnalytics();
+
+    document.getElementById('topBreadcrumb').textContent = `Live Data · ${allUsers.length} users · Updated ${new Date().toLocaleTimeString()}`;
+    document.getElementById('navUserCount').textContent = allUsers.length;
+  } catch(e) {
+    console.error('Firebase error:', e);
+    document.getElementById('topBreadcrumb').textContent = 'Error loading data — check Firebase config & console';
+  }
+};
+
+// ═══ RENDER OVERVIEW ═══
+function renderOverview() {
+  document.getElementById('kpiUsers').textContent = allUsers.length.toLocaleString();
+  const onboarded = allUsers.filter(u => u.interface_stage !== undefined).length;
+  document.getElementById('kpiActive').textContent = onboarded;
+  const totalTrades = allUsers.reduce((s,u) => s + (u.mock_trade_count || 0), 0);
+  document.getElementById('kpiTrades').textContent = totalTrades.toLocaleString();
+  const totalLessons = allProgress.reduce((s,p) => s + (p.completedLessons?.length || 0), 0);
+  document.getElementById('kpiLessons').textContent = totalLessons.toLocaleString();
+
+  // Stage distribution
+  const stages = {0:0,1:0,2:0,3:0,4:0};
+  allUsers.forEach(u => { const s = u.interface_stage; if(s!==undefined) stages[s]=(stages[s]||0)+1; else stages[0]++; });
+  const stageNames = {0:'Not Onboarded',1:'Stage 1 (Beginner)',2:'Stage 2 (Explorer)',3:'Stage 3 (Pro)',4:'Stage 4 (Pro+)'};
+  const stageColors = {0:'var(--txt3)',1:'var(--grn)',2:'var(--blu)',3:'var(--amb)',4:'var(--pur)'};
+  const sd = document.getElementById('stageDist');
+  sd.innerHTML = '';
+  Object.entries(stages).forEach(([k,v]) => {
+    const pct = allUsers.length > 0 ? Math.round(v/allUsers.length*100) : 0;
+    sd.innerHTML += `<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:600">${stageNames[k]}</span><span style="color:var(--txt3)">${v} (${pct}%)</span></div><div style="height:6px;background:var(--surf);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${stageColors[k]};border-radius:3px"></div></div></div>`;
+  });
+
+  // Placement distribution
+  const placements = {};
+  allUsers.forEach(u => { const p = u.placement_level || 'none'; placements[p] = (placements[p]||0)+1; });
+  const pd = document.getElementById('placementDist');
+  pd.innerHTML = '';
+  const plColors = {none:'var(--txt3)',absolute_beginner:'var(--grn)',aware_beginner:'var(--blu)',intermediate:'var(--amb)',experienced:'var(--pur)'};
+  Object.entries(placements).forEach(([k,v]) => {
+    const pct = allUsers.length > 0 ? Math.round(v/allUsers.length*100) : 0;
+    pd.innerHTML += `<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:600">${k.replace(/_/g,' ')}</span><span style="color:var(--txt3)">${v} (${pct}%)</span></div><div style="height:6px;background:var(--surf);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${plColors[k]||'var(--txt3)'};border-radius:3px"></div></div></div>`;
+  });
+
+  // Recent signups (sorted by createdAt)
+  const sorted = [...allUsers].sort((a,b) => {
+    const ta = a.createdAt?.seconds || 0, tb = b.createdAt?.seconds || 0;
+    return tb - ta;
+  }).slice(0, 6);
+  const rs = document.getElementById('recentSignups');
+  rs.innerHTML = '';
+  const avColors = ['#a78bfa','#60a5fa','#63dca0','#fbbf24','#f87171','#22d3ee'];
+  sorted.forEach((u,i) => {
+    const name = u.displayName || u.email?.split('@')[0] || 'User';
+    const email = u.email || '—';
+    const ago = u.createdAt?.seconds ? timeAgo(u.createdAt.seconds * 1000) : '—';
+    rs.innerHTML += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr)"><div style="width:28px;height:28px;border-radius:50%;background:${avColors[i%6]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${name[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div><div style="font-size:11px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${email}</div></div><span style="font-size:11px;color:var(--txt3);flex-shrink:0">${ago}</span></div>`;
+  });
+
+  // Top progress
+  const userLessons = {};
+  allProgress.forEach(p => {
+    const uid = p.userId;
+    if(!uid) return;
+    userLessons[uid] = (userLessons[uid] || 0) + (p.completedLessons?.length || 0);
+  });
+  const topUsers = Object.entries(userLessons).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const tp = document.getElementById('topProgress');
+  tp.innerHTML = '';
+  topUsers.forEach(([uid, count]) => {
+    const user = allUsers.find(u => u.uid === uid || u.id === uid);
+    const name = user?.displayName || user?.email?.split('@')[0] || uid.slice(0,8);
+    tp.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span style="font-size:13px;font-weight:600">${name}</span><span class="badge badge-g">${count} lessons</span></div>`;
+  });
+}
+
+// ═══ RENDER USERS TABLE ═══
+function renderUsers(filter = 'all') {
+  let filtered = allUsers;
+  if (filter === 'onboarded') filtered = allUsers.filter(u => u.interface_stage !== undefined);
+  if (filter === 'pending') filtered = allUsers.filter(u => u.interface_stage === undefined);
+
+  const ut = document.getElementById('usersTable');
+  ut.innerHTML = '';
+  if (filtered.length === 0) {
+    ut.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--txt3)">No users found</td></tr>';
+    return;
+  }
+
+  const avColors = ['#a78bfa','#60a5fa','#63dca0','#fbbf24','#f87171','#22d3ee','#8b5cf6','#34d399'];
+  filtered.forEach((u, i) => {
+    const name = u.displayName || u.email?.split('@')[0] || 'Unknown';
+    const email = u.email || '—';
+    const stage = u.interface_stage !== undefined ? u.interface_stage : '—';
+    const stageBadge = stage === '—' ? 'badge-a' : stage <= 1 ? 'badge-g' : stage <= 2 ? 'badge-b' : stage <= 3 ? 'badge-a' : 'badge-p';
+    const placement = u.placement_level ? u.placement_level.replace(/_/g,' ') : '—';
+    const joined = u.createdAt?.seconds ? new Date(u.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    const trades = u.mock_trade_count || 0;
+    const streak = u.streak_current || 0;
+    const portfolio = u.virtual_portfolio_value ? '₹'+(u.virtual_portfolio_value/100000).toFixed(1)+'L' : '—';
+
+    ut.innerHTML += `<tr>
+      <td><div class="user-cell"><div class="user-av" style="background:${avColors[i%8]}">${name[0].toUpperCase()}</div><div><div class="user-name">${name}</div><div class="user-email">${email}</div></div></div></td>
+      <td><span class="badge ${stageBadge}">Stage ${stage}</span></td>
+      <td style="font-size:12px;text-transform:capitalize">${placement}</td>
+      <td style="font-size:12px;color:var(--txt2)">${joined}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${trades}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${streak} 🔥</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600">${portfolio}</td>
+    </tr>`;
+  });
+}
+
+// ═══ RENDER COURSES TABLE ═══
+function renderCourses() {
+  const ct = document.getElementById('coursesTable');
+  ct.innerHTML = '';
+  COURSES.forEach(c => {
+    const lc = c.level==='Beginner'?'badge-g':c.level==='Intermediate'?'badge-a':c.level==='Advanced'?'badge-r':'badge-b';
+    const sc = c.stage<=2?'badge-g':c.stage===3?'badge-a':'badge-p';
+    ct.innerHTML += `<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${c.num}</td>
+      <td style="font-weight:600">${c.title}</td>
+      <td style="font-size:12px;color:var(--txt2)">${c.section}</td>
+      <td><span class="badge ${lc}">${c.level}</span></td>
+      <td>${c.lessons}</td>
+      <td style="font-size:12px;color:var(--txt2)">${c.duration}</td>
+      <td><span class="badge ${sc}">Stage ${c.stage}+</span></td>
+    </tr>`;
+  });
+}
+
+// ═══ RENDER ANALYTICS ═══
+function renderAnalytics() {
+  const onboarded = allUsers.filter(u => u.interface_stage !== undefined);
+  const avgStreak = onboarded.length > 0 ? (onboarded.reduce((s,u) => s+(u.streak_current||0),0)/onboarded.length).toFixed(1) : 0;
+  const longestStreak = allUsers.reduce((m,u) => Math.max(m, u.streak_longest||0), 0);
+  const avgPortfolio = onboarded.length > 0 ? (onboarded.reduce((s,u) => s+(u.virtual_portfolio_value||0),0)/onboarded.length) : 0;
+  const avgTrades = onboarded.length > 0 ? (onboarded.reduce((s,u) => s+(u.mock_trade_count||0),0)/onboarded.length).toFixed(1) : 0;
+
+  document.getElementById('kpiStreaks').textContent = avgStreak + ' days';
+  document.getElementById('kpiLongestStreak').textContent = longestStreak + ' days';
+  document.getElementById('kpiAvgPortfolio').textContent = '₹'+(avgPortfolio/100000).toFixed(1)+'L';
+  document.getElementById('kpiAvgTrades').textContent = avgTrades;
+
+  // Stage breakdown (same as overview but different container)
+  const stages = {1:0,2:0,3:0,4:0};
+  onboarded.forEach(u => { stages[u.interface_stage] = (stages[u.interface_stage]||0)+1; });
+  const sb = document.getElementById('stageBreakdown');
+  sb.innerHTML = '';
+  const sNames = {1:'🌱 Beginner',2:'🧭 Explorer',3:'📊 Active Learner',4:'⚡ Serious Trader'};
+  Object.entries(stages).forEach(([k,v]) => {
+    sb.innerHTML += `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:13px">${sNames[k]||'Stage '+k}</span><span style="font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace">${v}</span></div>`;
+  });
+
+  // Engagement
+  const totalLessons = allProgress.reduce((s,p) => s+(p.completedLessons?.length||0),0);
+  const totalTrades = allUsers.reduce((s,u) => s+(u.mock_trade_count||0),0);
+  const eng = [
+    {n:'Total Lessons Completed', v:totalLessons.toLocaleString()},
+    {n:'Total Mock Trades', v:totalTrades.toLocaleString()},
+    {n:'Users with Progress', v:new Set(allProgress.map(p=>p.userId)).size},
+    {n:'Avg Lessons/User', v:onboarded.length>0?(totalLessons/onboarded.length).toFixed(1):'0'},
+    {n:'Course Progress Records', v:allProgress.length},
+  ];
+  const ed = document.getElementById('engagementData');
+  ed.innerHTML = '';
+  eng.forEach(e => {
+    ed.innerHTML += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:13px;color:var(--txt2)">${e.n}</span><span style="font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace">${e.v}</span></div>`;
+  });
+}
+
+// ═══ HELPERS ═══
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff/60000);
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins/60);
+  if (hrs < 24) return hrs + 'h ago';
+  const days = Math.floor(hrs/24);
+  return days + 'd ago';
+}
+
+// ═══ INIT ═══
+loadAllData();
+
+// ═══ NAV ═══
+const titles = {overview:'Dashboard',users:'User Management',courses:'Course Management',news:'News & Content',analytics:'Platform Analytics',appearance:'Appearance & Branding',platform:'Platform Settings',billing:'Plans & Billing'};
+document.querySelectorAll('[data-p]').forEach(el => {
+  el.addEventListener('click', () => {
+    const p = el.dataset.p;
+    document.querySelectorAll('.adm-page').forEach(s => s.classList.remove('visible'));
+    document.getElementById('p-'+p)?.classList.add('visible');
+    document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector(`.admin-nav-item[data-p="${p}"]`)?.classList.add('active');
+    document.getElementById('topTitle').textContent = titles[p] || p;
+  });
+});
+
+// ═══ TABS ═══
+document.querySelectorAll('.adm-tabs').forEach(b => {
+  b.querySelectorAll('.adm-tab').forEach(t => {
+    t.onclick = () => {
+      b.querySelectorAll('.adm-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      if (t.dataset.filter) renderUsers(t.dataset.filter);
+    };
+  });
+});
+
+// ═══ THEME ═══
+document.getElementById('themeToggle').onclick = () => {
+  document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+};
+
+// ═══ COLOR PICKERS ═══
+document.querySelectorAll('.color-swatch input[type="color"]').forEach(inp => {
+  inp.addEventListener('input', e => {
+    const row = e.target.closest('.color-row');
+    row.querySelector('.color-swatch').style.background = e.target.value;
+    row.querySelector('.color-val').textContent = e.target.value.toUpperCase();
+  });
+});
+</script>
+</body>
+</html>
