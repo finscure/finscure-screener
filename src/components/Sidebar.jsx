@@ -65,10 +65,9 @@ export default function Sidebar({ activePage, onNavigate }) {
 
   return (
     <aside style={{
-      width: 220, minWidth: 220, minHeight: "calc(100vh - 64px)",
+      width: 220, minWidth: 220, height: "100%",
       background: "var(--bg-secondary)", borderRight: "1px solid var(--border)",
-      padding: "16px 12px", position: "fixed", top: 64, left: 0, bottom: 0,
-      overflowY: "auto", transition: "all 0.35s",
+      padding: "16px 12px", overflowY: "auto",
     }}>
       {/* Stage Badge */}
       <div style={{ margin: "0 8px 16px", padding: "10px 12px", borderRadius: 10, background: meta.bg, display: "flex", alignItems: "center", gap: 10 }}>

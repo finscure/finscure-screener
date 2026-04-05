@@ -3,23 +3,16 @@ import { useAuth } from "../contexts/AuthContext";
 import SearchModal from "./SearchModal";
 import UpgradeModal from "./UpgradeModal";
 
-export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, stockPrices }) {
+export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, stockPrices, onToggleMobileSidebar }) {
   const { user, logout, loginWithGoogle } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
-  // FIX 5: Cmd+K / Ctrl+K keyboard shortcut for search
   useEffect(() => {
     function handleKey(e) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setShowSearch(true);
-      }
-      if (e.key === "Escape") {
-        setShowSearch(false);
-        setShowUpgrade(false);
-      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setShowSearch(true); }
+      if (e.key === "Escape") { setShowSearch(false); setShowUpgrade(false); }
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -35,26 +28,32 @@ export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, s
 
   return (
     <>
-      <nav style={{
+      <nav className="topnav" style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0 40px", height: 64,
         background: "var(--nav-bg)", backdropFilter: "blur(20px)",
         borderBottom: "1px solid var(--border)", transition: "all 0.35s",
       }}>
-        {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: 22, letterSpacing: -0.5, cursor: "pointer" }}
-          onClick={() => onNavigate("dashboard")}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8, background: "var(--gradient-green)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 16, fontWeight: 700, color: "var(--btn-text)",
-          }}>F</div>
-          Finscure
+        {/* Left: Hamburger (mobile) + Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Mobile hamburger */}
+          <button className="mobile-hamburger" onClick={onToggleMobileSidebar} aria-label="Menu">☰</button>
+
+          {/* Logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: 22, letterSpacing: -0.5, cursor: "pointer" }}
+            onClick={() => onNavigate("dashboard")}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 8, background: "var(--gradient-green)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 16, fontWeight: 700, color: "var(--btn-text)", flexShrink: 0,
+            }}>F</div>
+            <span className="topnav-logo-text">Finscure</span>
+          </div>
         </div>
 
-        {/* Nav Links */}
-        <div style={{ display: "flex", gap: 4 }}>
+        {/* Center: Nav Links (hidden on mobile) */}
+        <div className="topnav-links" style={{ display: "flex", gap: 4 }}>
           {navLinks.map(link => (
             <a key={link.id} href="#"
               onClick={e => { e.preventDefault(); onNavigate(link.id); }}
@@ -73,20 +72,23 @@ export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, s
         </div>
 
         {/* Right Side */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {/* FIX 5: Functional Search Button */}
-          <div onClick={() => setShowSearch(true)} style={{
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Search — full on desktop, icon-only on mobile */}
+          <div className="topnav-search-full" onClick={() => setShowSearch(true)} style={{
             display: "flex", alignItems: "center", gap: 8,
             background: "var(--surface)", border: "1px solid var(--border)",
             borderRadius: 8, padding: "7px 14px", fontSize: 13, color: "var(--text-muted)",
             cursor: "pointer", transition: "all 0.3s",
-          }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = "var(--border-active)"}
-            onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
-          >
+          }}>
             <span>🔍</span> Search...
             <kbd style={{ background: "var(--kbd-bg)", padding: "1px 6px", borderRadius: 4, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>⌘K</kbd>
           </div>
+          {/* Mobile search icon */}
+          <button onClick={() => setShowSearch(true)} style={{
+            display: "none", width: 36, height: 36, borderRadius: 8, border: "none",
+            background: "var(--surface)", cursor: "pointer", fontSize: 16, color: "var(--text-primary)",
+            alignItems: "center", justifyContent: "center",
+          }} className="mobile-search-btn">🔍</button>
 
           {/* Theme Toggle */}
           <div onClick={onToggleTheme} title="Toggle theme" style={{
@@ -106,8 +108,8 @@ export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, s
             }} />
           </div>
 
-          {/* FIX 6: Functional Upgrade Button */}
-          <button onClick={() => setShowUpgrade(true)} className="btn-primary" style={{ padding: "8px 20px", fontSize: 14 }}>
+          {/* Upgrade (hidden on mobile) */}
+          <button onClick={() => setShowUpgrade(true)} className="btn-primary topnav-upgrade" style={{ padding: "8px 20px", fontSize: 14 }}>
             Upgrade Pro
           </button>
 
@@ -117,7 +119,7 @@ export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, s
               <div onClick={() => setShowUserMenu(!showUserMenu)} style={{
                 width: 34, height: 34, borderRadius: "50%", background: "var(--gradient-blue)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 13, fontWeight: 600, cursor: "pointer", color: "#fff", overflow: "hidden",
+                fontSize: 13, fontWeight: 600, cursor: "pointer", color: "#fff", overflow: "hidden", flexShrink: 0,
               }}>
                 {user.photoURL ? (
                   <img src={user.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -144,22 +146,13 @@ export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, s
             <div onClick={loginWithGoogle} style={{
               width: 34, height: 34, borderRadius: "50%", background: "var(--gradient-blue)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 13, fontWeight: 600, cursor: "pointer", color: "#fff",
+              fontSize: 13, fontWeight: 600, cursor: "pointer", color: "#fff", flexShrink: 0,
             }}>?</div>
           )}
         </div>
       </nav>
 
-      {/* FIX 5: Search Modal */}
-      {showSearch && (
-        <SearchModal
-          onClose={() => setShowSearch(false)}
-          onNavigate={onNavigate}
-          stockPrices={stockPrices}
-        />
-      )}
-
-      {/* FIX 6: Upgrade Modal */}
+      {showSearch && <SearchModal onClose={() => setShowSearch(false)} onNavigate={onNavigate} stockPrices={stockPrices} />}
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
     </>
   );

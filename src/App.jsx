@@ -63,6 +63,7 @@ function AppContent() {
   // Main app state
   const [activePage, setActivePage] = useState("learn");
   const [activeCourse, setActiveCourse] = useState(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => {
     try { return localStorage.getItem("finscure-theme") || "dark"; } catch { return "dark"; }
   });
@@ -134,12 +135,11 @@ function AppContent() {
 
   // ═══ NON-AUTH FLOW ═══
   if (!user) {
-    // Stage 0: First lesson without auth
     if (flowState === "stage0") {
       return (
         <>
           <StageZeroLesson onComplete={(action) => {
-            setLoginMode(action); // "signup" or "login"
+            setLoginMode(action);
             setFlowState("login-after-stage0");
             setShowLogin(true);
           }} />
@@ -148,7 +148,6 @@ function AppContent() {
       );
     }
 
-    // Placement Quiz (no auth yet — quiz first, login after)
     if (flowState === "quiz") {
       return (
         <>
@@ -165,15 +164,14 @@ function AppContent() {
       );
     }
 
-    // Login modal requested from quiz flow
-    if (flowState === "login-for-quiz") {
+    if (flowState === "login-for-quiz" || flowState === "login-after-stage0") {
       return (
         <>
           <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>{pendingQuizResult?.emoji || "📊"}</div>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>{pendingQuizResult?.emoji || "🌱"}</div>
               <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Almost there!</h2>
-              <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 24 }}>Sign in to save your placement and start learning.</p>
+              <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 24 }}>Sign in to save your progress and start learning.</p>
               <button onClick={() => setShowLogin(true)} className="btn-primary" style={{ padding: "14px 36px", fontSize: 15 }}>Sign In / Create Account</button>
             </div>
           </div>
@@ -182,7 +180,7 @@ function AppContent() {
       );
     }
 
-    // Default: Landing Page
+    // Default: Landing Page (catches all non-auth states)
     return (
       <LandingPage
         onNotYet={() => setFlowState("stage0")}
@@ -236,11 +234,26 @@ function AppContent() {
     }
   }
 
+  function mobileNavigate(page) { navigate(page); setMobileSidebarOpen(false); }
+
   return (
     <>
-      <TopNav activePage={activePage} onNavigate={navigate} onToggleTheme={toggleTheme} theme={theme} stockPrices={stockPrices} />
+      <TopNav activePage={activePage} onNavigate={mobileNavigate} onToggleTheme={toggleTheme} theme={theme} stockPrices={stockPrices}
+        onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)} />
+
+      {/* Mobile sidebar overlay */}
+      <div className={`sidebar-overlay${mobileSidebarOpen ? " open" : ""}`} onClick={() => setMobileSidebarOpen(false)} />
+
       <div className="app-layout">
-        <Sidebar activePage={activePage} onNavigate={navigate} />
+        {/* Desktop sidebar */}
+        <div className="sidebar-desktop">
+          <Sidebar activePage={activePage} onNavigate={navigate} />
+        </div>
+        {/* Mobile sidebar */}
+        <div className={`sidebar-mobile${mobileSidebarOpen ? " open" : ""}`}>
+          <Sidebar activePage={activePage} onNavigate={mobileNavigate} />
+        </div>
+
         <main className="main-content" key={activePage + (activeCourse || "")} style={{ animation: "fadeUp 0.4s ease" }}>
           {renderPage()}
         </main>

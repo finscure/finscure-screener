@@ -270,3 +270,125 @@ body {
   border-radius: 14px; overflow: hidden; height: fit-content;
   position: sticky; top: 84px; transition: all 0.35s;
 }
+
+/* ============ MOBILE SIDEBAR ============ */
+.sidebar-desktop {
+  position: fixed; top: 64px; left: 0; bottom: 0; width: 220px; z-index: 50;
+  overflow: hidden;
+}
+.sidebar-desktop > aside {
+  width: 100%; height: 100%; overflow-y: auto;
+}
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0; z-index: 199;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+}
+.sidebar-overlay.open { display: block; }
+.sidebar-mobile { display: none; }
+.mobile-hamburger { display: none; }
+
+/* ============ RESPONSIVE — TABLET (<=1024px) ============ */
+@media (max-width: 1024px) {
+  .main-content { margin-left: 220px; padding: 20px; }
+  .dash-layout { grid-template-columns: 1fr; }
+  .dash-news-sidebar { position: static; }
+  .trading-layout { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .hero-stats { gap: 20px; flex-wrap: wrap; }
+  .hero-title { font-size: 24px; }
+  .hero-banner { padding: 24px; }
+  .achievements-row { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ============ RESPONSIVE — MOBILE (<=768px) ============ */
+@media (max-width: 768px) {
+  /* Sidebar: hidden by default, shown as overlay */
+  .sidebar-desktop { display: none !important; }
+  .sidebar-mobile {
+    display: block;
+    position: fixed; top: 56px; left: 0; bottom: 0; width: 260px;
+    z-index: 200; transform: translateX(-100%); transition: transform 0.3s ease;
+    background: var(--bg-secondary); border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 16px 12px;
+  }
+  .sidebar-mobile.open { transform: translateX(0); }
+
+  /* Show hamburger */
+  .mobile-hamburger {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 8px; border: none;
+    background: var(--surface); cursor: pointer; font-size: 20px;
+    color: var(--text-primary); flex-shrink: 0;
+  }
+  .mobile-search-btn { display: flex !important; }
+
+  /* Main content: full width */
+  .app-layout { padding-top: 56px; }
+  .main-content { margin-left: 0 !important; padding: 16px 14px; max-width: 100vw !important; }
+
+  /* TopNav adjustments */
+  .topnav { height: 56px !important; padding: 0 14px !important; }
+  .topnav-links { display: none !important; }
+  .topnav-search-full { display: none !important; }
+  .topnav-logo-text { display: none !important; }
+  .topnav-upgrade { display: none !important; }
+
+  /* Grids */
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .courses-grid { grid-template-columns: 1fr; gap: 12px; }
+  .strategies-grid { grid-template-columns: 1fr; }
+  .trading-layout { grid-template-columns: 1fr; }
+  .dash-layout { grid-template-columns: 1fr; }
+  .achievements-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+  /* Hero */
+  .hero-banner { padding: 20px 16px; border-radius: 12px; margin-bottom: 16px; }
+  .hero-title { font-size: 22px; }
+  .hero-subtitle { font-size: 13px; }
+  .hero-stats { gap: 16px; }
+  .hero-stat-val { font-size: 20px; }
+
+  /* Filter/tab bar */
+  .tab-bar { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; width: 100%; }
+  .tab { padding: 7px 14px; font-size: 12px; flex-shrink: 0; }
+
+  /* Filter chips */
+  .filter-chips-row { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap !important; }
+  .filter-chip { flex-shrink: 0; font-size: 12px; padding: 6px 12px; }
+
+  /* Tables */
+  .table-wrap { border-radius: 10px; }
+  .table-wrap table { min-width: 500px; }
+  .table-wrap thead th { padding: 10px 12px; font-size: 10px; }
+  .table-wrap tbody td { padding: 10px 12px; font-size: 13px; }
+
+  /* Stat cards */
+  .stat-card { padding: 12px 14px; border-radius: 10px; }
+  .stat-value { font-size: 20px; }
+  .stat-label { font-size: 11px; }
+
+  /* Section headers */
+  .section-title { font-size: 18px; }
+  .section-subtitle { font-size: 12px; }
+
+  /* Ticker tape */
+  .ticker-tape { margin-bottom: 16px; }
+  .tape-item { font-size: 12px; }
+
+  /* Course card */
+  .course-card:hover { transform: none; box-shadow: none; }
+
+  /* Misc spacing */
+  .btn-primary { font-size: 13px; }
+}
+
+/* ============ RESPONSIVE — SMALL MOBILE (<=480px) ============ */
+@media (max-width: 480px) {
+  .main-content { padding: 12px 10px; }
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .hero-banner { padding: 16px 14px; }
+  .hero-title { font-size: 20px; }
+  .hero-stats { flex-direction: column; gap: 12px; }
+  .achievements-row { grid-template-columns: repeat(2, 1fr); }
+  .section-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
