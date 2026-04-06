@@ -86,23 +86,23 @@ export default function CoursesPage({ onOpenCourse }) {
             onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>{showUpgradeFor.reason === "paid" ? "🔒" : "📚"}</div>
             <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
-              {showUpgradeFor.reason === "paid" ? `${showUpgradeFor.tier} Feature` : "Keep Learning to Unlock"}
+              {showUpgradeFor.reason === "paid" ? "Pro Feature — Coming Soon" : "Keep Learning to Unlock"}
             </h3>
             <p style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 20, lineHeight: 1.5 }}>
               {showUpgradeFor.reason === "paid"
-                ? `This module is available with the ${showUpgradeFor.tier} plan (${showUpgradeFor.price}). Upgrade to access advanced content.`
+                ? "This module will be available with Finscure Pro. We're launching soon — keep learning and you'll be the first to know!"
                 : `${showUpgradeFor.unlockReq} to unlock this module. You're making great progress!`
               }
             </p>
-            {showUpgradeFor.reason === "paid" ? (
+            {showUpgradeFor.reason === "paid" && (
+              <span style={{ display: "inline-block", fontSize: 12, fontWeight: 700, color: "var(--amber)", background: "var(--amber-dim)", padding: "5px 14px", borderRadius: 8, marginBottom: 16 }}>🚀 Coming Soon</span>
+            )}
+            <div>
               <button className="btn-primary" style={{ padding: "12px 32px", fontSize: 14 }}
                 onClick={() => setShowUpgradeFor(null)}>
-                Upgrade to {showUpgradeFor.tier} — {showUpgradeFor.price}
+                {showUpgradeFor.reason === "paid" ? "Got it" : "Back to Learning"}
               </button>
-            ) : (
-              <button className="btn-primary" style={{ padding: "12px 32px", fontSize: 14 }}
-                onClick={() => setShowUpgradeFor(null)}>
-                Got it — Back to Learning
+            </div>
               </button>
             )}
             <div>
@@ -243,7 +243,7 @@ export default function CoursesPage({ onOpenCourse }) {
                       }}>
                         {isLocked ? (
                           <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                            {isPro ? `🔒 ${access.tier} — ${access.price}` : `🔒 ${access.unlockReq}`}
+                            {isPro ? "🔒 Pro · Coming Soon" : `🔒 ${access.unlockReq}`}
                           </span>
                         ) : (
                           <>
