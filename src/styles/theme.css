@@ -37,41 +37,41 @@
   --input-bg: #111827;
 }
 [data-theme="light"] {
-  --bg-primary: #f4f6f9;
+  --bg-primary: #f3f2f7;
   --bg-secondary: #ffffff;
   --bg-card: #ffffff;
-  --bg-card-hover: #f0f2f5;
-  --surface: #e8ecf1;
-  --border: rgba(0,0,0,0.08);
-  --border-active: rgba(16,150,90,0.35);
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
+  --bg-card-hover: #eeedf5;
+  --surface: #e4e2ee;
+  --border: rgba(40,33,83,0.1);
+  --border-active: rgba(40,33,83,0.35);
+  --text-primary: #1a1632;
+  --text-secondary: #4a4568;
+  --text-muted: #8b85a6;
   --green: #10965a;
   --green-dim: rgba(16,150,90,0.1);
   --red: #dc2626;
   --red-dim: rgba(220,38,38,0.08);
-  --blue: #2563eb;
-  --blue-dim: rgba(37,99,235,0.08);
+  --blue: #3b3196;
+  --blue-dim: rgba(59,49,150,0.08);
   --amber: #d97706;
   --amber-dim: rgba(217,119,6,0.08);
-  --purple: #7c3aed;
-  --purple-dim: rgba(124,58,237,0.08);
-  --gradient-green: linear-gradient(135deg, #10965a, #059669);
-  --gradient-blue: linear-gradient(135deg, #2563eb, #4f46e5);
+  --purple: #282153;
+  --purple-dim: rgba(40,33,83,0.1);
+  --gradient-green: linear-gradient(135deg, #282153, #3b3196);
+  --gradient-blue: linear-gradient(135deg, #3b3196, #4f46e5);
   --gradient-amber: linear-gradient(135deg, #d97706, #b45309);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,0.08);
-  --nav-bg: rgba(255,255,255,0.88);
-  --hero-bg: linear-gradient(135deg, #e8f5ee 0%, #dbeafe 50%, #f0fdf4 100%);
-  --hero-glow: rgba(16,150,90,0.08);
-  --grid-line: rgba(0,0,0,0.06);
-  --hover-bg: rgba(0,0,0,0.03);
-  --hover-subtle: rgba(0,0,0,0.02);
-  --chart-grid: rgba(0,0,0,0.05);
-  --kbd-bg: rgba(0,0,0,0.06);
-  --modal-bg: rgba(0,0,0,0.45);
+  --shadow-lg: 0 20px 60px rgba(40,33,83,0.1);
+  --nav-bg: rgba(255,255,255,0.92);
+  --hero-bg: linear-gradient(135deg, #eceaf5 0%, #e4e1f0 50%, #f3f2f7 100%);
+  --hero-glow: rgba(40,33,83,0.06);
+  --grid-line: rgba(40,33,83,0.06);
+  --hover-bg: rgba(40,33,83,0.04);
+  --hover-subtle: rgba(40,33,83,0.02);
+  --chart-grid: rgba(40,33,83,0.05);
+  --kbd-bg: rgba(40,33,83,0.06);
+  --modal-bg: rgba(26,22,50,0.45);
   --btn-text: #ffffff;
-  --input-bg: #f4f6f9;
+  --input-bg: #f3f2f7;
 }
 
 /* ============ BASE ============ */

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import LoginModal from "./LoginModal";
+import Logo from "../components/Logo";
 
 const FEATURES = [
   { icon: "📚", title: "30 Structured Modules", desc: "From basics to algo trading. 268 lessons across 8 sections — Foundation, FA, TA, Smart Money, Derivatives, and more.", color: "var(--green)" },
@@ -50,7 +51,7 @@ export default function LandingPage({ onNotYet, onHaveExperience }) {
         justifyContent: "space-between", padding: "0 24px",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--gradient-green)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "var(--btn-text)" }}>F</div>
+          <Logo size={30} />
           <span style={{ fontSize: 17, fontWeight: 700, fontFamily: "'Playfair Display',serif" }}>Finscure</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -357,7 +358,7 @@ export default function LandingPage({ onNotYet, onHaveExperience }) {
       <footer style={{ padding: "32px 20px", borderTop: "1px solid var(--border)", background: "var(--bg-secondary)" }}>
         <div style={{ ...sectionStyle, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 24, height: 24, borderRadius: 6, background: "var(--gradient-green)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--btn-text)" }}>F</div>
+            <Logo size={24} />
             <span style={{ fontSize: 14, fontWeight: 700, fontFamily: "'Playfair Display',serif" }}>Finscure</span>
             <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 8 }}>© 2026 Aspire Educational Technologies LLC</span>
           </div>

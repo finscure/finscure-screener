@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Logo from "../components/Logo";
+// removed duplicate below from "react";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginModal({ onClose }) {
@@ -45,7 +47,7 @@ export default function LoginModal({ onClose }) {
         boxShadow: "var(--shadow-lg)",
       }} onClick={e => e.stopPropagation()}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--gradient-green)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "var(--btn-text)", marginBottom: 12 }}>F</div>
+          <Logo size={40} style={{ marginBottom: 12 }} />
           <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, margin: "0 0 4px" }}>
             {mode === "login" ? "Welcome back" : "Create account"}
           </h2>

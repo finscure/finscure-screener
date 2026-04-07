@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import SearchModal from "./SearchModal";
 import UpgradeModal from "./UpgradeModal";
+import Logo from "./Logo";
 
 export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, stockPrices, onToggleMobileSidebar }) {
   const { user, logout, loginWithGoogle } = useAuth();
@@ -43,11 +44,7 @@ export default function TopNav({ activePage, onNavigate, onToggleTheme, theme, s
           {/* Logo */}
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: 22, letterSpacing: -0.5, cursor: "pointer" }}
             onClick={() => onNavigate("dashboard")}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 8, background: "var(--gradient-green)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 16, fontWeight: 700, color: "var(--btn-text)", flexShrink: 0,
-            }}>F</div>
+            <Logo size={30} />
             <span className="topnav-logo-text">Finscure</span>
           </div>
         </div>

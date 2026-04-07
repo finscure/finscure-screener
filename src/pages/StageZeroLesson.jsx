@@ -1,3 +1,4 @@
+import Logo from "../components/Logo";
 import { useState } from "react";
 
 // Stage 0: Zero Friction Entry — Lesson 1.1 without any auth
@@ -46,7 +47,7 @@ export default function StageZeroLesson({ onComplete }) {
     <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 16px" }}>
       {/* Minimal header */}
       <div style={{ width: "100%", maxWidth: 680, display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--gradient-green)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "var(--btn-text)" }}>F</div>
+        <Logo size={32} />
         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Lesson 1 of 268</span>
         <div style={{ marginLeft: "auto", fontSize: 12, color: "var(--text-muted)" }}>~4 min read</div>
       </div>
