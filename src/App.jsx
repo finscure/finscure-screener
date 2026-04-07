@@ -12,6 +12,7 @@ import LandingPage from "./pages/LandingPage";
 import StageZeroLesson from "./pages/StageZeroLesson";
 import PlacementQuiz from "./pages/PlacementQuiz";
 import LoginModal from "./pages/LoginModal";
+import MarketNews from "./components/MarketNews";
 import "./styles/theme.css";
 
 const PLACEHOLDER_PAGES = {
@@ -24,7 +25,6 @@ const PLACEHOLDER_PAGES = {
   sectors: { title: "Sector Analytics", subtitle: "Sector rotation & heatmap", icon: "🏭" },
   backtest: { title: "Strategy Backtester", subtitle: "Test against 10 years of data", icon: "⏪" },
   builder: { title: "Custom Screener Builder", subtitle: "AND/OR logic · Save & reuse screens", icon: "🧮" },
-  news: { title: "Market News & Insights", subtitle: "Latest developments shaping Indian markets", icon: "📰" },
   fiidii: { title: "FII / DII Activity", subtitle: "Foreign & domestic institutional flows", icon: "🏛" },
   calendar: { title: "Calendar & Earnings", subtitle: "Events, results & holidays", icon: "📅" },
   alerts: { title: "Alerts & Watchlist", subtitle: "Price alerts and tracked stocks", icon: "🔔" },
@@ -226,6 +226,7 @@ function AppContent() {
       case "screener": return <ScreenerPage />;
       case "courses": return <CoursesPage onOpenCourse={openCourse} />;
       case "trading": return <TradingPage />;
+      case "news": return <div><div className="section-header"><div><div className="section-title">Market News</div><div className="section-subtitle">Live headlines from Google News</div></div></div><MarketNews /></div>;
       default: {
         const ph = PLACEHOLDER_PAGES[activePage];
         if (ph) return <PlaceholderPage {...ph} />;

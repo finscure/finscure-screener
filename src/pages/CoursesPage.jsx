@@ -103,8 +103,6 @@ export default function CoursesPage({ onOpenCourse }) {
                 {showUpgradeFor.reason === "paid" ? "Got it" : "Back to Learning"}
               </button>
             </div>
-              </button>
-            )}
             <div>
               <button onClick={() => setShowUpgradeFor(null)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", marginTop: 12, fontFamily: "inherit" }}>Close</button>
             </div>
