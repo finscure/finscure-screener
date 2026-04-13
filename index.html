@@ -8,7 +8,14 @@
     <title>Finscure — Learn Stock Trading the Right Way</title>
     <meta name="description" content="India's step-by-step stock market learning platform. 30 modules, mock trading with real prices, and interactive charts. Free to start." />
     <meta name="keywords" content="stock market, learn trading, NSE, BSE, mock trading, stock screener, technical analysis, fundamental analysis, India, Finscure" />
-    <meta name="author" content="Aspire Educational Technologies LLC" />
+    <meta name="author" content="Finscure LLP" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Finscure" />
 
     <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
     <meta property="og:type" content="website" />
@@ -40,5 +47,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
