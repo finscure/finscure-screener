@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ═══ USERS ═══
+    // Users can read/write only their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Admin can read all users (set custom claim admin=true via Firebase Admin SDK)
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // ═══ PROGRESS ═══
+    // Progress docs are keyed as {userId}_{courseId}
+    // Users can only access their own progress
+    match /progress/{docId} {
+      allow read, write: if request.auth != null && docId.matches(request.auth.uid + '_.*');
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
+    // ═══ MOCK PORTFOLIOS ═══
+    // Portfolios are keyed by userId
+    match /mock_portfolios/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ═══ MOCK TRANSACTIONS ═══
+    // Users can read their own transactions, create new ones
+    match /mock_transactions/{docId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      // No update/delete — transaction history is immutable
+    }
+
+    // ═══ DENY EVERYTHING ELSE ═══
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
