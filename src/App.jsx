@@ -13,6 +13,7 @@ import StageZeroLesson from "./pages/StageZeroLesson";
 import PlacementQuiz from "./pages/PlacementQuiz";
 import LoginModal from "./pages/LoginModal";
 import MarketNews from "./components/MarketNews";
+import SeasonalityPage from "./pages/SeasonalityPage";
 import "./styles/theme.css";
 
 const PLACEHOLDER_PAGES = {
@@ -54,25 +55,17 @@ function parseSearchCSV(text) {
 function AppContent() {
   const { user, userProfile, loading, completeOnboarding } = useAuth();
 
-  // Flow state for non-auth users
-  const [flowState, setFlowState] = useState("landing"); // landing | stage0 | quiz | login-after-stage0 | login-for-quiz
+  const [flowState, setFlowState] = useState("landing");
   const [pendingQuizResult, setPendingQuizResult] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
-  const [loginMode, setLoginMode] = useState(null); // "signup" | "login"
-
-  // Main app state
+  const [loginMode, setLoginMode] = useState(null);
   const [activePage, setActivePage] = useState("learn");
   const [activeCourse, setActiveCourse] = useState(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    try { return localStorage.getItem("finscure-theme") || "dark"; } catch { return "dark"; }
-  });
+  const [theme, setTheme] = useState(() => { try { return localStorage.getItem("finscure-theme") || "dark"; } catch { return "dark"; } });
   const [stockPrices, setStockPrices] = useState({});
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    try { localStorage.setItem("finscure-theme", theme); } catch {}
-  }, [theme]);
+  useEffect(() => { document.documentElement.setAttribute("data-theme", theme); try { localStorage.setItem("finscure-theme", theme); } catch {} }, [theme]);
 
   useEffect(() => {
     async function fetchPrices() {
@@ -88,34 +81,21 @@ function AppContent() {
     return () => clearInterval(iv);
   }, []);
 
-  // When user logs in after Stage 0 lesson
   useEffect(() => {
     if (user && flowState === "login-after-stage0") {
-      // Stage 0 user signed up → set as absolute beginner, Stage 1
       completeOnboarding({ placement_level: "absolute_beginner", interface_stage: 1, starting_module: 1, mock_portfolio_value: 100000 });
-      setFlowState("app");
-      setShowLogin(false);
+      setFlowState("app"); setShowLogin(false);
     }
     if (user && flowState === "login-for-quiz" && !showLogin) {
-      // After login for quiz path, check if placement is done
-      if (pendingQuizResult) {
-        completeOnboarding(pendingQuizResult);
-        setPendingQuizResult(null);
-        setFlowState("app");
-      } else if (userProfile && userProfile.interface_stage !== undefined) {
-        setFlowState("app");
-      }
+      if (pendingQuizResult) { completeOnboarding(pendingQuizResult); setPendingQuizResult(null); setFlowState("app"); }
+      else if (userProfile && userProfile.interface_stage !== undefined) { setFlowState("app"); }
     }
   }, [user, flowState, showLogin]);
 
-  // Set default page based on stage
   useEffect(() => {
     if (user && userProfile?.interface_stage !== undefined && flowState !== "app") {
       setFlowState("app");
-      // Set default page based on stage
-      const stage = userProfile.interface_stage;
-      if (stage <= 2) setActivePage("learn");
-      else setActivePage("dashboard");
+      setActivePage(userProfile.interface_stage <= 2 ? "learn" : "dashboard");
     }
   }, [user, userProfile]);
 
@@ -123,102 +103,33 @@ function AppContent() {
   function navigate(page) { setActivePage(page); setActiveCourse(null); window.scrollTo(0, 0); }
   function openCourse(courseId) { setActiveCourse(courseId); window.scrollTo(0, 0); }
 
-  // ═══ LOADING ═══
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-primary)" }}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--gradient-green)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 700, color: "var(--btn-text)", marginBottom: 16 }}>F</div>
+        <img src="/logo-sm.png" alt="Finscure" style={{ width: 48, height: 48, borderRadius: 12, marginBottom: 16 }} />
         <div style={{ color: "var(--text-muted)", fontSize: 14 }}>Loading Finscure...</div>
       </div>
     </div>
   );
 
-  // ═══ NON-AUTH FLOW ═══
+  // Non-auth flow
   if (!user) {
-    if (flowState === "stage0") {
-      return (
-        <>
-          <StageZeroLesson onComplete={(action) => {
-            setLoginMode(action);
-            setFlowState("login-after-stage0");
-            setShowLogin(true);
-          }} />
-          {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
-        </>
-      );
-    }
-
-    if (flowState === "quiz") {
-      return (
-        <>
-          <PlacementQuiz
-            onBack={() => setFlowState("landing")}
-            onComplete={(placement) => {
-              setPendingQuizResult(placement);
-              setFlowState("login-for-quiz");
-              setShowLogin(true);
-            }}
-          />
-          {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
-        </>
-      );
-    }
-
-    if (flowState === "login-for-quiz" || flowState === "login-after-stage0") {
-      return (
-        <>
-          <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>{pendingQuizResult?.emoji || "🌱"}</div>
-              <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Almost there!</h2>
-              <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 24 }}>Sign in to save your progress and start learning.</p>
-              <button onClick={() => setShowLogin(true)} className="btn-primary" style={{ padding: "14px 36px", fontSize: 15 }}>Sign In / Create Account</button>
-            </div>
-          </div>
-          {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
-        </>
-      );
-    }
-
-    // Default: Landing Page (catches all non-auth states)
-    return (
-      <LandingPage
-        onNotYet={() => setFlowState("stage0")}
-        onHaveExperience={() => setFlowState("quiz")}
-      />
-    );
+    if (flowState === "stage0") return (<><StageZeroLesson onComplete={(action) => { setLoginMode(action); setFlowState("login-after-stage0"); setShowLogin(true); }} />{showLogin && <LoginModal onClose={() => setShowLogin(false)} />}</>);
+    if (flowState === "quiz") return (<><PlacementQuiz onBack={() => setFlowState("landing")} onComplete={(placement) => { setPendingQuizResult(placement); setFlowState("login-for-quiz"); setShowLogin(true); }} />{showLogin && <LoginModal onClose={() => setShowLogin(false)} />}</>);
+    if (flowState === "login-for-quiz" || flowState === "login-after-stage0") return (<><div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ textAlign: "center" }}><div style={{ fontSize: 48, marginBottom: 16 }}>{pendingQuizResult?.emoji || "🌱"}</div><h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Almost there!</h2><p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 24 }}>Sign in to save your progress and start learning.</p><button onClick={() => setShowLogin(true)} className="btn-primary" style={{ padding: "14px 36px", fontSize: 15 }}>Sign In / Create Account</button></div></div>{showLogin && <LoginModal onClose={() => setShowLogin(false)} />}</>);
+    return <LandingPage onNotYet={() => setFlowState("stage0")} onHaveExperience={() => setFlowState("quiz")} />;
   }
 
-  // ═══ AUTH USER — NEEDS ONBOARDING ═══
+  // Auth user needs onboarding
   if (user && userProfile && userProfile.interface_stage === undefined) {
-    // User is logged in but hasn't completed placement
-    // Could be: signed up via Stage 0 (already handled above) or old user needing quiz
-    if (pendingQuizResult) {
-      // Apply pending quiz result
-      completeOnboarding(pendingQuizResult);
-      setPendingQuizResult(null);
-      return null; // Will re-render with profile
-    }
-
-    // Show placement quiz for auth'd users without placement
-    return (
-      <PlacementQuiz
-        onBack={() => {/* Can't go back if logged in — just take quiz */}}
-        onComplete={(placement) => {
-          completeOnboarding(placement);
-        }}
-      />
-    );
+    if (pendingQuizResult) { completeOnboarding(pendingQuizResult); setPendingQuizResult(null); return null; }
+    return <PlacementQuiz onBack={() => {}} onComplete={(placement) => { completeOnboarding(placement); }} />;
   }
 
-  // ═══ MAIN APP — AUTH USER WITH PLACEMENT ═══
   const stage = userProfile?.interface_stage || 1;
 
   function renderPage() {
-    // Course detail view — works from both "learn" and "courses" pages
-    if ((activePage === "courses" || activePage === "learn") && activeCourse) {
-      return <CourseDetailPage courseId={activeCourse} onBack={() => setActiveCourse(null)} />;
-    }
+    if ((activePage === "courses" || activePage === "learn") && activeCourse) return <CourseDetailPage courseId={activeCourse} onBack={() => setActiveCourse(null)} />;
     if (activePage === "learn") return <CoursesPage onOpenCourse={openCourse} />;
 
     switch (activePage) {
@@ -227,6 +138,7 @@ function AppContent() {
       case "courses": return <CoursesPage onOpenCourse={openCourse} />;
       case "trading": return <TradingPage />;
       case "news": return <div><div className="section-header"><div><div className="section-title">Market News</div><div className="section-subtitle">Live headlines from Google News</div></div></div><MarketNews /></div>;
+      case "seasonality": return <SeasonalityPage />;
       default: {
         const ph = PLACEHOLDER_PAGES[activePage];
         if (ph) return <PlaceholderPage {...ph} />;
@@ -241,32 +153,16 @@ function AppContent() {
     <>
       <TopNav activePage={activePage} onNavigate={mobileNavigate} onToggleTheme={toggleTheme} theme={theme} stockPrices={stockPrices}
         onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)} />
-
-      {/* Mobile sidebar overlay */}
       <div className={`sidebar-overlay${mobileSidebarOpen ? " open" : ""}`} onClick={() => setMobileSidebarOpen(false)} />
-
       <div className="app-layout">
-        {/* Desktop sidebar */}
-        <div className="sidebar-desktop">
-          <Sidebar activePage={activePage} onNavigate={navigate} />
-        </div>
-        {/* Mobile sidebar */}
-        <div className={`sidebar-mobile${mobileSidebarOpen ? " open" : ""}`}>
-          <Sidebar activePage={activePage} onNavigate={mobileNavigate} />
-        </div>
-
-        <main className="main-content" key={activePage + (activeCourse || "")} style={{ animation: "fadeUp 0.4s ease" }}>
-          {renderPage()}
-        </main>
+        <div className="sidebar-desktop"><Sidebar activePage={activePage} onNavigate={navigate} /></div>
+        <div className={`sidebar-mobile${mobileSidebarOpen ? " open" : ""}`}><Sidebar activePage={activePage} onNavigate={mobileNavigate} /></div>
+        <main className="main-content" key={activePage + (activeCourse || "")} style={{ animation: "fadeUp 0.4s ease" }}>{renderPage()}</main>
       </div>
     </>
   );
 }
 
 export default function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
+  return <AuthProvider><AppContent /></AuthProvider>;
 }
