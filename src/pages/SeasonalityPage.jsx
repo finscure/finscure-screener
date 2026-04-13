@@ -1,28 +1,77 @@
-import { useState, useEffect } from "react";
-import { calcMonthlySeasonality, calcDayOfWeekSeasonality } from "../utils/indicators";
+import { useState, useEffect, useRef } from "react";
+
+const SEARCH_SHEET_URLS = [
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWUEPUEjhHmatIkwy4lF0pCpYk-RWQJHH_GZ411Of1Up4zCI3rc3LAFg19swY08w/pub?gid=1599136282&single=true&output=csv",
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQBPcckfsQIkHnfPAYyPpd8jA1mqxzJ1W8hSZNcBW6iaUY9CmXDmh4c5bOt-wD5OQ/pub?gid=1658167544&single=true&output=csv",
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSw_stoaW3BHQHRxFQ7diKSYNlvMXVLdUTV7KCBb5csfV4GzQXI_KGud1-K5Hnejg/pub?gid=622298709&single=true&output=csv",
+];
+
+function parseCSV(text) {
+  const rows = text.split("\n").slice(1).filter(r => r.trim());
+  const data = {};
+  for (const row of rows) {
+    const c = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+    const cl = c.map(x => x.replace(/^"|"$/g, "").trim());
+    if (cl[0] && parseFloat(cl[4]) > 0) data[cl[0]] = { symbol: cl[0], name: cl[1] || cl[0], ltp: parseFloat(cl[4]), change: parseFloat(cl[5]) || 0 };
+  }
+  return data;
+}
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function getCellColor(val) {
+  if (val === null || val === undefined) return "transparent";
+  const v = parseFloat(val);
+  if (v > 15) return "rgba(22,163,74,0.55)";
+  if (v > 8) return "rgba(22,163,74,0.4)";
+  if (v > 3) return "rgba(22,163,74,0.25)";
+  if (v > 0) return "rgba(22,163,74,0.12)";
+  if (v > -3) return "rgba(239,68,68,0.12)";
+  if (v > -8) return "rgba(239,68,68,0.25)";
+  if (v > -15) return "rgba(239,68,68,0.4)";
+  return "rgba(239,68,68,0.55)";
+}
+
+function getCellTextColor(val) {
+  if (val === null || val === undefined) return "var(--text-muted)";
+  const v = parseFloat(val);
+  if (Math.abs(v) > 8) return "#fff";
+  return v >= 0 ? "var(--green)" : "var(--red)";
+}
 
 export default function SeasonalityPage() {
+  const [stocks, setStocks] = useState({});
   const [symbol, setSymbol] = useState("RELIANCE");
   const [search, setSearch] = useState("");
-  const [monthlyData, setMonthlyData] = useState([]);
-  const [dowData, setDowData] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [tab, setTab] = useState("monthly");
-  const [years, setYears] = useState(0);
-  const [dataPoints, setDataPoints] = useState(0);
+  const [heatmapData, setHeatmapData] = useState(null);
+  const searchRef = useRef(null);
 
+  // Load stock list
+  useEffect(() => {
+    async function loadStocks() {
+      try {
+        const results = await Promise.allSettled(SEARCH_SHEET_URLS.map(u => fetch(u).then(r => r.text())));
+        const merged = {};
+        for (const r of results) if (r.status === "fulfilled") Object.assign(merged, parseCSV(r.value));
+        setStocks(merged);
+      } catch (e) { console.error(e); }
+    }
+    loadStocks();
+  }, []);
+
+  // Fetch seasonality data
   async function loadSeasonality(sym) {
     setLoading(true);
     setError(null);
-    setMonthlyData([]);
-    setDowData([]);
+    setHeatmapData(null);
 
-    // Try multiple intervals/ranges for best data
     const attempts = [
-      { interval: "Y", label: "5yr weekly" },
-      { interval: "3M", label: "3yr weekly" },
-      { interval: "M", label: "2yr daily" },
+      { interval: "Y", label: "5yr" },
+      { interval: "3M", label: "3yr" },
+      { interval: "M", label: "2yr" },
     ];
 
     let data = null;
@@ -34,66 +83,148 @@ export default function SeasonalityPage() {
         if (!res.ok) { lastErr = `API returned ${res.status}`; continue; }
         const json = await res.json();
         if (json.error) { lastErr = json.error; continue; }
-        if (json.data && json.data.length > 40) {
-          data = json.data;
-          break;
-        } else {
-          lastErr = `Only ${json.data?.length || 0} data points from ${attempt.label}`;
-        }
-      } catch (e) {
-        lastErr = e.message || "Network error";
-      }
+        if (json.data && json.data.length > 40) { data = json.data; break; }
+        else lastErr = `Only ${json.data?.length || 0} data points`;
+      } catch (e) { lastErr = e.message; }
     }
 
-    if (data && data.length > 40) {
-      const monthly = calcMonthlySeasonality(data);
-      const dow = calcDayOfWeekSeasonality(data);
-      setMonthlyData(monthly);
-      setDowData(dow);
-      setDataPoints(data.length);
-      const firstDate = new Date(data[0].time * 1000);
-      const lastDate = new Date(data[data.length - 1].time * 1000);
-      setYears(Math.max(1, Math.round((lastDate - firstDate) / (365.25 * 24 * 60 * 60 * 1000))));
-    } else {
-      setError(lastErr || "Could not load enough historical data. Try a different stock (e.g., RELIANCE, TCS, HDFCBANK).");
+    if (!data || data.length < 40) {
+      setError(lastErr || "Not enough data");
+      setLoading(false);
+      return;
     }
+
+    // Build year-month return matrix
+    const monthlyData = {};
+    let prevClose = null;
+    let currentMonth = -1;
+    let currentYear = -1;
+    let monthOpen = null;
+
+    data.forEach(d => {
+      const date = new Date(d.time * 1000);
+      const m = date.getMonth();
+      const y = date.getFullYear();
+
+      if (m !== currentMonth || y !== currentYear) {
+        if (monthOpen !== null && prevClose !== null && currentYear > 0) {
+          const ret = ((prevClose - monthOpen) / monthOpen) * 100;
+          if (!monthlyData[currentYear]) monthlyData[currentYear] = {};
+          monthlyData[currentYear][currentMonth] = parseFloat(ret.toFixed(2));
+        }
+        currentMonth = m;
+        currentYear = y;
+        monthOpen = d.open;
+      }
+      prevClose = d.close;
+    });
+    // Last month
+    if (monthOpen !== null && prevClose !== null && currentYear > 0) {
+      if (!monthlyData[currentYear]) monthlyData[currentYear] = {};
+      monthlyData[currentYear][currentMonth] = parseFloat(((prevClose - monthOpen) / monthOpen * 100).toFixed(2));
+    }
+
+    // Sort years descending
+    const years = Object.keys(monthlyData).map(Number).sort((a, b) => b - a);
+
+    // Calculate averages per month
+    const avgMonthly = {};
+    for (let m = 0; m < 12; m++) {
+      const vals = years.map(y => monthlyData[y]?.[m]).filter(v => v !== undefined);
+      avgMonthly[m] = vals.length > 0 ? parseFloat((vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(2)) : null;
+    }
+
+    // Calculate yearly returns
+    const yearlyReturns = {};
+    years.forEach(y => {
+      const monthVals = Object.values(monthlyData[y]);
+      if (monthVals.length > 0) {
+        // Compound monthly returns
+        let compound = 1;
+        monthVals.forEach(v => { compound *= (1 + v / 100); });
+        yearlyReturns[y] = parseFloat(((compound - 1) * 100).toFixed(2));
+      }
+    });
+
+    const stock = stocks[sym];
+    setHeatmapData({ years, monthlyData, avgMonthly, yearlyReturns, stock });
     setLoading(false);
   }
 
   useEffect(() => { loadSeasonality(symbol); }, []);
 
-  function handleSearch(e) {
-    e.preventDefault();
-    const sym = search.trim().toUpperCase();
-    if (sym) { setSymbol(sym); setSearch(""); loadSeasonality(sym); }
+  function selectStock(sym) {
+    setSymbol(sym);
+    setSearch("");
+    setShowDropdown(false);
+    loadSeasonality(sym);
   }
 
-  const maxMonthlyReturn = monthlyData.length > 0 ? Math.max(...monthlyData.map(d => Math.abs(d.avgReturn)), 1) : 1;
-  const maxDowReturn = dowData.length > 0 ? Math.max(...dowData.map(d => Math.abs(d.avgReturn)), 0.01) : 1;
+  const searchResults = search.length >= 1
+    ? Object.values(stocks).filter(s => s.symbol.toLowerCase().includes(search.toLowerCase()) || s.name.toLowerCase().includes(search.toLowerCase())).slice(0, 8)
+    : [];
+
+  const stock = stocks[symbol];
+  const thStyle = { padding: "10px 8px", fontSize: 11, fontWeight: 700, textAlign: "center", color: "var(--text-muted)", borderBottom: "2px solid var(--border)", whiteSpace: "nowrap", position: "sticky", top: 0, background: "var(--bg-card)", zIndex: 2 };
+  const tdStyle = { padding: "8px 6px", fontSize: 12, fontWeight: 600, textAlign: "center", borderBottom: "1px solid var(--border)", fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap" };
 
   return (
     <div>
-      {/* Header */}
       <div className="section-header">
         <div>
-          <div className="section-title">📅 Seasonality Analysis</div>
-          <div className="section-subtitle">Historical patterns by month and day-of-week</div>
+          <div className="section-title">Seasonality Analysis</div>
+          <div className="section-subtitle">Monthly return heatmap from historical data</div>
         </div>
       </div>
 
-      {/* Stock Search */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
-        <form onSubmit={handleSearch} style={{ display: "flex", gap: 8 }}>
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Enter stock symbol..."
-            style={{ padding: "9px 14px", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-primary)", fontSize: 14, fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, outline: "none", width: 180 }}
+      {/* Stock Search Bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 16px" }}>
+        {/* Search input */}
+        <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
+          <input ref={searchRef} type="text" value={search} placeholder={`Search stocks... (current: ${symbol})`}
+            onChange={e => { setSearch(e.target.value); setShowDropdown(true); }}
+            onFocus={() => { if (search.length >= 1) setShowDropdown(true); }}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+            style={{ width: "100%", padding: "10px 14px", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-primary)", fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: "none" }}
           />
-          <button type="submit" className="btn-primary" style={{ padding: "9px 18px", fontSize: 13 }}>Analyze</button>
-        </form>
-        <div style={{ display: "flex", gap: 6 }}>
-          {["RELIANCE", "TCS", "HDFCBANK", "INFY", "ITC"].map(s => (
-            <button key={s} onClick={() => { setSymbol(s); setSearch(""); loadSeasonality(s); }} style={{
-              padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-              background: symbol === s ? "var(--green-dim)" : "var(--bg-card)",
+          {showDropdown && searchResults.length > 0 && (
+            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.3)", zIndex: 50, marginTop: 4, maxHeight: 280, overflowY: "auto" }}>
+              {searchResults.map(s => (
+                <div key={s.symbol} onMouseDown={() => selectStock(s.symbol)}
+                  style={{ padding: "10px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border)", fontSize: 13 }}
+                  onMouseEnter={e => e.currentTarget.style.background = "var(--hover-bg)"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <div>
+                    <span style={{ fontWeight: 700 }}>{s.symbol}</span>
+                    <span style={{ color: "var(--text-muted)", fontSize: 11, marginLeft: 8 }}>{s.name}</span>
+                  </div>
+                  <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 12, color: s.change >= 0 ? "var(--green)" : "var(--red)" }}>₹{s.ltp?.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Current stock info */}
+        {stock && (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700 }}>{symbol}</div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{stock.name}</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 18, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace" }}>₹{stock.ltp?.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: stock.change >= 0 ? "var(--green)" : "var(--red)" }}>{stock.change >= 0 ? "▲" : "▼"} {Math.abs(stock.change).toFixed(2)}%</div>
+            </div>
+          </div>
+        )}
+
+        {/* Quick picks */}
+        <div style={{ display: "flex", gap: 4 }}>
+          {["RELIANCE", "TCS", "HDFCBANK", "INFY", "ITC", "SBIN"].map(s => (
+            <button key={s} onClick={() => selectStock(s)} style={{
+              padding: "5px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+              background: symbol === s ? "var(--green-dim)" : "transparent",
               border: `1px solid ${symbol === s ? "var(--green)" : "var(--border)"}`,
               color: symbol === s ? "var(--green)" : "var(--text-muted)",
             }}>{s}</button>
@@ -106,7 +237,6 @@ export default function SeasonalityPage() {
         <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, padding: 48, textAlign: "center" }}>
           <div style={{ width: 24, height: 24, border: "2px solid var(--border)", borderTop: "2px solid var(--green)", borderRadius: "50%", animation: "spin 0.6s linear infinite", margin: "0 auto 12px" }} />
           <div style={{ fontSize: 14, color: "var(--text-muted)" }}>Loading seasonality for {symbol}...</div>
-          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Fetching multi-year data from Yahoo Finance</div>
         </div>
       )}
 
@@ -115,111 +245,89 @@ export default function SeasonalityPage() {
         <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, padding: 32, textAlign: "center" }}>
           <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Could not load data for {symbol}</div>
-          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 16, maxWidth: 400, margin: "0 auto 16px" }}>{error}</div>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 16 }}>{error}</div>
           <button onClick={() => loadSeasonality(symbol)} className="btn-primary" style={{ padding: "8px 20px", fontSize: 13 }}>Retry</button>
         </div>
       )}
 
-      {/* Results */}
-      {!loading && !error && monthlyData.length > 0 && (
+      {/* Heatmap Table */}
+      {!loading && !error && heatmapData && (
         <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-          {/* Results Header */}
-          <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 700 }}>{symbol}</div>
-              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{years} years · {dataPoints} data points · NSE</div>
-            </div>
-            <div style={{ display: "flex", gap: 3, background: "var(--bg-secondary)", borderRadius: 8, padding: 3 }}>
-              <button onClick={() => setTab("monthly")} style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", background: tab === "monthly" ? "var(--green-dim)" : "transparent", color: tab === "monthly" ? "var(--green)" : "var(--text-muted)" }}>Monthly</button>
-              <button onClick={() => setTab("dow")} style={{ padding: "6px 14px", borderRadius: 6, fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", background: tab === "dow" ? "var(--green-dim)" : "transparent", color: tab === "dow" ? "var(--green)" : "var(--text-muted)" }}>Day of Week</button>
-            </div>
-          </div>
-
-          <div style={{ padding: 20 }}>
-            {/* Monthly */}
-            {tab === "monthly" && (
-              <div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 180, marginBottom: 20, padding: "0 4px" }}>
-                  {monthlyData.map((d, i) => {
-                    const pos = d.avgReturn >= 0;
-                    const h = Math.max((Math.abs(d.avgReturn) / maxMonthlyReturn) * 80, 3);
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
+              <thead>
+                <tr>
+                  <th style={{ ...thStyle, textAlign: "left", paddingLeft: 16, minWidth: 70 }}>Year</th>
+                  {MONTHS.map(m => <th key={m} style={thStyle}>{m}</th>)}
+                  <th style={{ ...thStyle, borderLeft: "2px solid var(--border)", minWidth: 80 }}>Yearly<br />Returns</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Average row */}
+                <tr style={{ background: "var(--bg-secondary)" }}>
+                  <td style={{ ...tdStyle, textAlign: "left", paddingLeft: 16, fontWeight: 800, fontSize: 11, color: "var(--text-primary)" }}>Average Monthly<br />Performance</td>
+                  {MONTHS.map((_, i) => {
+                    const val = heatmapData.avgMonthly[i];
                     return (
-                      <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", height: "100%" }}>
-                        <div style={{ fontSize: 10, fontWeight: 600, color: pos ? "var(--green)" : "var(--red)", marginBottom: 4, fontFamily: "'JetBrains Mono',monospace" }}>{pos ? "+" : ""}{d.avgReturn}%</div>
-                        <div style={{ width: "100%", maxWidth: 36, height: `${h}px`, borderRadius: "4px 4px 2px 2px", background: pos ? `rgba(99,220,160,${0.3 + (d.winRate / 100) * 0.5})` : `rgba(248,113,113,${0.3 + ((100 - d.winRate) / 100) * 0.5})` }} />
-                        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6, fontWeight: 600 }}>{d.month}</div>
-                      </div>
+                      <td key={i} style={{ ...tdStyle, background: getCellColor(val), color: getCellTextColor(val) }}>
+                        {val !== null ? `${val >= 0 ? "" : ""}${val.toFixed(2)}%` : "—"}
+                      </td>
                     );
                   })}
-                </div>
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-                    <thead><tr>
-                      <th style={{ textAlign: "left", padding: "8px 10px", color: "var(--text-muted)", fontWeight: 600, borderBottom: "1px solid var(--border)", fontSize: 10, textTransform: "uppercase" }}>Month</th>
-                      <th style={{ textAlign: "right", padding: "8px 10px", color: "var(--text-muted)", fontWeight: 600, borderBottom: "1px solid var(--border)", fontSize: 10, textTransform: "uppercase" }}>Avg Return</th>
-                      <th style={{ textAlign: "right", padding: "8px 10px", color: "var(--text-muted)", fontWeight: 600, borderBottom: "1px solid var(--border)", fontSize: 10, textTransform: "uppercase" }}>Win Rate</th>
-                      <th style={{ textAlign: "right", padding: "8px 10px", color: "var(--text-muted)", fontWeight: 600, borderBottom: "1px solid var(--border)", fontSize: 10, textTransform: "uppercase" }}>Years</th>
-                    </tr></thead>
-                    <tbody>{monthlyData.map((d, i) => (
-                      <tr key={i}>
-                        <td style={{ padding: "8px 10px", fontWeight: 600, borderBottom: "1px solid var(--border)" }}>{d.month}</td>
-                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, color: d.avgReturn >= 0 ? "var(--green)" : "var(--red)", borderBottom: "1px solid var(--border)" }}>{d.avgReturn >= 0 ? "+" : ""}{d.avgReturn}%</td>
-                        <td style={{ padding: "8px 10px", textAlign: "right", borderBottom: "1px solid var(--border)" }}><span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 4, background: d.winRate >= 60 ? "var(--green-dim)" : d.winRate <= 40 ? "var(--red-dim)" : "var(--amber-dim)", color: d.winRate >= 60 ? "var(--green)" : d.winRate <= 40 ? "var(--red)" : "var(--amber)" }}>{d.winRate}%</span></td>
-                        <td style={{ padding: "8px 10px", textAlign: "right", color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>{d.years}</td>
-                      </tr>
-                    ))}</tbody>
-                  </table>
-                </div>
-                {(() => {
-                  const best = monthlyData.reduce((a, b) => a.avgReturn > b.avgReturn ? a : b);
-                  const worst = monthlyData.reduce((a, b) => a.avgReturn < b.avgReturn ? a : b);
-                  return (
-                    <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 10, background: "var(--green-dim)", borderLeft: "3px solid var(--green)", fontSize: 13, color: "var(--green)", lineHeight: 1.6 }}>
-                      <strong>{symbol}</strong> historically performs best in <strong>{best.month}</strong> ({best.winRate}% win rate, avg +{best.avgReturn}%) and worst in <strong>{worst.month}</strong> ({worst.winRate}% win rate, avg {worst.avgReturn}%).
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
+                  <td style={{ ...tdStyle, borderLeft: "2px solid var(--border)", color: "var(--text-muted)" }}>—</td>
+                </tr>
 
-            {/* Day of Week */}
-            {tab === "dow" && dowData.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 12, height: 160, marginBottom: 20, justifyContent: "center" }}>
-                  {dowData.map((d, i) => {
-                    const pos = d.avgReturn >= 0;
-                    const h = Math.max((Math.abs(d.avgReturn) / maxDowReturn) * 100, 4);
-                    return (
-                      <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", height: "100%", width: 60 }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: pos ? "var(--green)" : "var(--red)", marginBottom: 4, fontFamily: "'JetBrains Mono',monospace" }}>{pos ? "+" : ""}{d.avgReturn}%</div>
-                        <div style={{ width: 40, height: `${h}px`, borderRadius: "6px 6px 2px 2px", background: pos ? "var(--green)" : "var(--red)", opacity: 0.6 }} />
-                        <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 8, fontWeight: 600 }}>{d.day}</div>
-                        <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{d.winRate}% win</div>
-                      </div>
-                    );
-                  })}
+                {/* Year rows */}
+                {heatmapData.years.map(year => (
+                  <tr key={year}>
+                    <td style={{ ...tdStyle, textAlign: "left", paddingLeft: 16, fontWeight: 800, color: "var(--text-primary)" }}>{year}</td>
+                    {MONTHS.map((_, i) => {
+                      const val = heatmapData.monthlyData[year]?.[i];
+                      const hasVal = val !== undefined;
+                      return (
+                        <td key={i} style={{ ...tdStyle, background: hasVal ? getCellColor(val) : "transparent", color: hasVal ? getCellTextColor(val) : "var(--text-muted)" }}>
+                          {hasVal ? `${val.toFixed(2)}%` : ""}
+                        </td>
+                      );
+                    })}
+                    <td style={{
+                      ...tdStyle, borderLeft: "2px solid var(--border)", fontWeight: 800,
+                      background: heatmapData.yearlyReturns[year] !== undefined ? getCellColor(heatmapData.yearlyReturns[year]) : "transparent",
+                      color: heatmapData.yearlyReturns[year] !== undefined ? getCellTextColor(heatmapData.yearlyReturns[year]) : "var(--text-muted)",
+                    }}>
+                      {heatmapData.yearlyReturns[year] !== undefined ? `${heatmapData.yearlyReturns[year].toFixed(2)}%` : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Insight */}
+          {heatmapData.avgMonthly && (() => {
+            const entries = MONTHS.map((m, i) => ({ month: m, val: heatmapData.avgMonthly[i] })).filter(e => e.val !== null);
+            if (entries.length === 0) return null;
+            const best = entries.reduce((a, b) => a.val > b.val ? a : b);
+            const worst = entries.reduce((a, b) => a.val < b.val ? a : b);
+            const totalYears = heatmapData.years.length;
+            const positiveYears = heatmapData.years.filter(y => heatmapData.yearlyReturns[y] > 0).length;
+            return (
+              <div style={{ padding: "16px 20px", borderTop: "1px solid var(--border)", display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13 }}>
+                <div style={{ padding: "10px 14px", borderRadius: 8, background: "var(--green-dim)", color: "var(--green)", flex: 1, minWidth: 200 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 2 }}>Best Month: {best.month}</div>
+                  <div style={{ fontSize: 12 }}>Average return of +{best.val.toFixed(2)}%</div>
                 </div>
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-                    <thead><tr>
-                      <th style={{ textAlign: "left", padding: "8px 10px", color: "var(--text-muted)", fontWeight: 600, borderBottom: "1px solid var(--border)", fontSize: 10, textTransform: "uppercase" }}>Day</th>
-                      <th style={{ textAlign: "right", padding: "8px 10px", color: "var(--text-muted)", fontWeight: 600, borderBottom: "1px solid var(--border)", fontSize: 10, textTransform: "uppercase" }}>Avg Return</th>
-                      <th style={{ textAlign: "right", padding: "8px 10px", color: "var(--text-muted)", fontWeight: 600, borderBottom: "1px solid var(--border)", fontSize: 10, textTransform: "uppercase" }}>Win Rate</th>
-                      <th style={{ textAlign: "right", padding: "8px 10px", color: "var(--text-muted)", fontWeight: 600, borderBottom: "1px solid var(--border)", fontSize: 10, textTransform: "uppercase" }}>Samples</th>
-                    </tr></thead>
-                    <tbody>{dowData.map((d, i) => (
-                      <tr key={i}>
-                        <td style={{ padding: "8px 10px", fontWeight: 600, borderBottom: "1px solid var(--border)" }}>{d.day}</td>
-                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600, color: d.avgReturn >= 0 ? "var(--green)" : "var(--red)", borderBottom: "1px solid var(--border)" }}>{d.avgReturn >= 0 ? "+" : ""}{d.avgReturn}%</td>
-                        <td style={{ padding: "8px 10px", textAlign: "right", borderBottom: "1px solid var(--border)" }}><span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 4, background: d.winRate >= 55 ? "var(--green-dim)" : d.winRate <= 45 ? "var(--red-dim)" : "var(--amber-dim)", color: d.winRate >= 55 ? "var(--green)" : d.winRate <= 45 ? "var(--red)" : "var(--amber)" }}>{d.winRate}%</span></td>
-                        <td style={{ padding: "8px 10px", textAlign: "right", color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>{d.count}</td>
-                      </tr>
-                    ))}</tbody>
-                  </table>
+                <div style={{ padding: "10px 14px", borderRadius: 8, background: "var(--red-dim)", color: "var(--red)", flex: 1, minWidth: 200 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 2 }}>Worst Month: {worst.month}</div>
+                  <div style={{ fontSize: 12 }}>Average return of {worst.val.toFixed(2)}%</div>
+                </div>
+                <div style={{ padding: "10px 14px", borderRadius: 8, background: "var(--blue-dim)", color: "var(--blue)", flex: 1, minWidth: 200 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 2 }}>Positive Years: {positiveYears}/{totalYears}</div>
+                  <div style={{ fontSize: 12 }}>{Math.round(positiveYears / totalYears * 100)}% of years ended positive</div>
                 </div>
               </div>
-            )}
-          </div>
+            );
+          })()}
         </div>
       )}
     </div>
