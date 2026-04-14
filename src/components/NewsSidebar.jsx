@@ -53,7 +53,22 @@ export default function NewsSidebar({ onViewAll }) {
           if (ts > 0 && cleanTitle) items.push({ title: cleanTitle, link, pubDate, source, timestamp: ts });
         });
         items.sort((a, b) => b.timestamp - a.timestamp);
-        setNews(items.slice(0, 6));
+
+        // Deduplicate similar headlines
+        const deduped = [];
+        const stopwords = ["that","this","with","from","have","been","will","after","amid","over","into","says","said","than","also","more"];
+        function kw(t) { return t.toLowerCase().replace(/[^a-z0-9\s]/g,"").split(/\s+/).filter(w => w.length > 3 && !stopwords.includes(w)); }
+        items.forEach(item => {
+          const isDupe = deduped.some(ex => {
+            const k1 = kw(ex.title), k2 = kw(item.title);
+            if (!k1.length || !k2.length) return false;
+            const s = new Set(k2);
+            return k1.filter(w => s.has(w)).length / Math.min(k1.length, k2.length) >= 0.5;
+          });
+          if (!isDupe) deduped.push(item);
+        });
+
+        setNews(deduped.slice(0, 6));
       } catch (e) { console.error(e); }
       setLoading(false);
     }

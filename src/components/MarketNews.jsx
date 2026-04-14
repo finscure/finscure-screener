@@ -83,19 +83,46 @@ export default function MarketNews() {
       );
 
       // Merge all results
-      const allNews = [];
-      const seen = new Set();
+      const raw = [];
       results.forEach(r => {
-        if (r.status === "fulfilled") {
-          r.value.forEach(item => {
-            // Deduplicate by title similarity
-            const key = item.title.toLowerCase().slice(0, 40);
-            if (!seen.has(key)) {
-              seen.add(key);
-              allNews.push(item);
-            }
-          });
-        }
+        if (r.status === "fulfilled") r.value.forEach(item => raw.push(item));
+      });
+
+      // Sort by timestamp newest first before dedup (keep freshest version)
+      raw.sort((a, b) => b.timestamp - a.timestamp);
+
+      // Smart deduplication — catches same-topic articles from different sources
+      const allNews = [];
+      const seenKeys = new Set();
+
+      function getKeywords(title) {
+        return title.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, "")
+          .split(/\s+/)
+          .filter(w => w.length > 3 && !["that", "this", "with", "from", "have", "been", "will", "after", "amid", "over", "into", "says", "said", "than", "also", "more", "most", "here", "what", "your"].includes(w));
+      }
+
+      function isSimilar(title1, title2) {
+        const kw1 = getKeywords(title1);
+        const kw2 = getKeywords(title2);
+        if (kw1.length === 0 || kw2.length === 0) return false;
+        const set2 = new Set(kw2);
+        const overlap = kw1.filter(w => set2.has(w)).length;
+        const similarity = overlap / Math.min(kw1.length, kw2.length);
+        return similarity >= 0.5;
+      }
+
+      raw.forEach(item => {
+        // Exact title match
+        const exactKey = item.title.toLowerCase().trim();
+        if (seenKeys.has(exactKey)) return;
+
+        // Check similarity against already-added items
+        const isDupe = allNews.some(existing => isSimilar(existing.title, item.title));
+        if (isDupe) return;
+
+        seenKeys.add(exactKey);
+        allNews.push(item);
       });
 
       // Sort by timestamp — newest first
