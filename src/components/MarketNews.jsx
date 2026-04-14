@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
 const NEWS_FEEDS = [
-  "https://news.google.com/rss/search?q=indian+stock+market+OR+nifty+OR+sensex+when:1d&hl=en-IN&gl=IN&ceid=IN:en",
-  "https://news.google.com/rss/search?q=NSE+BSE+stocks+india+when:1d&hl=en-IN&gl=IN&ceid=IN:en",
+  "https://news.google.com/rss/search?q=indian+stock+market+OR+nifty+OR+sensex+when:7d&hl=en-IN&gl=IN&ceid=IN:en",
+  "https://news.google.com/rss/search?q=NSE+BSE+stocks+india+when:7d&hl=en-IN&gl=IN&ceid=IN:en",
 ];
 const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
