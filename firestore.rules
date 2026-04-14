@@ -41,6 +41,12 @@ service cloud.firestore {
       allow update: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
+    // ═══ MOCK WATCHLISTS ═══
+    // Users can read/write their own watchlist
+    match /mock_watchlists/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
     // ═══ DENY EVERYTHING ELSE ═══
     match /{document=**} {
       allow read, write: if false;
