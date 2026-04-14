@@ -33,6 +33,14 @@ service cloud.firestore {
       // No update/delete — transaction history is immutable
     }
 
+    // ═══ MOCK PENDING ORDERS ═══
+    // Users can create, read, and update their own pending orders
+    match /mock_pending_orders/{docId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
     // ═══ DENY EVERYTHING ELSE ═══
     match /{document=**} {
       allow read, write: if false;
