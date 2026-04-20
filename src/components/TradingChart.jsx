@@ -29,27 +29,12 @@ const AVAILABLE_INDICATORS = [
 
 const dataCache = {};
 
-// Convert Unix timestamp to IST date string for Lightweight Charts (YYYY-MM-DD)
-function toISTDate(unixSec) {
-  const d = new Date(unixSec * 1000);
-  const ist = new Date(d.getTime() + 5.5 * 60 * 60 * 1000);
-  return `${ist.getUTCFullYear()}-${String(ist.getUTCMonth() + 1).padStart(2, '0')}-${String(ist.getUTCDate()).padStart(2, '0')}`;
-}
-
-// Convert daily+ data timestamps to IST business dates
-function convertToISTDates(data, isIntraday) {
-  if (isIntraday) {
-    // For intraday, use Unix timestamps (Lightweight Charts handles them with timeVisible)
-    return data.map(d => ({ ...d, time: d.time + 19800 })); // Add 5h30m offset
-  }
-  // For daily+, use YYYY-MM-DD format
-  const seen = new Set();
-  return data.map(d => {
-    const dateStr = toISTDate(d.time);
-    if (seen.has(dateStr)) return null; // Skip duplicate dates
-    seen.add(dateStr);
-    return { ...d, time: dateStr };
-  }).filter(Boolean);
+// Convert Yahoo Finance UTC timestamps to IST date strings for daily charts
+function toISTDateStr(unixSec) {
+  // Add 5h30m to UTC to get IST, then extract date
+  const istMs = unixSec * 1000 + 19800000;
+  const d = new Date(istMs);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
 }
 
 export default function TradingChart({ symbol, ltp, changePercent }) {
@@ -68,6 +53,7 @@ export default function TradingChart({ symbol, ltp, changePercent }) {
   const [showIndicatorPanel, setShowIndicatorPanel] = useState(false);
 
   const isDark = typeof document !== 'undefined' ? document.documentElement.getAttribute('data-theme') !== 'light' : true;
+  const isIntraday = TIMEFRAMES.find(t => t.key === activeTimeframe)?.type === 'intraday';
 
   const colors = {
     bg: 'transparent', text: isDark ? '#64748b' : '#8b85a6',
@@ -87,34 +73,43 @@ export default function TradingChart({ symbol, ltp, changePercent }) {
     try {
       const timeframe = TIMEFRAMES.find(t => t.key === tf);
       if (timeframe.type === 'intraday') {
-        const raw = generateIntradayOHLC(ltp, changePercent, tf, tf === '5min' ? 3 : 5);
-        setChartData(convertToISTDates(raw, true));
+        // Simulated intraday — timestamps are already UTC (IST - 5:30)
+        // Lightweight Charts will display them using the timezone offset we set
+        const days = tf === '5min' ? 5 : 7;
+        const raw = generateIntradayOHLC(ltp, changePercent, tf, days);
+        setChartData(raw);
       } else {
+        // Yahoo Finance daily+ data
         const ck = `${symbol}_${tf}`;
         if (dataCache[ck] && Date.now() - dataCache[ck].ts < 300000) { setChartData(dataCache[ck].data); setLoading(false); return; }
         const res = await fetch(`/api/stock-history?symbol=${encodeURIComponent(symbol)}&interval=${tf}`);
         if (!res.ok) throw new Error(`API ${res.status}`);
         const json = await res.json();
         if (json.data?.length > 0) {
-          const converted = convertToISTDates(json.data, false);
+          // Convert to YYYY-MM-DD strings for daily data (avoids all timezone issues)
+          const seen = new Set();
+          const converted = json.data.map(d => {
+            const dateStr = toISTDateStr(d.time);
+            if (seen.has(dateStr)) return null;
+            seen.add(dateStr);
+            return { ...d, time: dateStr };
+          }).filter(Boolean);
           dataCache[ck] = { data: converted, ts: Date.now() };
           setChartData(converted);
         } else throw new Error('No data');
       }
     } catch (err) {
       setError('Using simulated data');
-      const raw = generateIntradayOHLC(ltp, changePercent, '5min', 10);
-      setChartData(convertToISTDates(raw, true));
+      setChartData(generateIntradayOHLC(ltp, changePercent, '5min', 5));
     }
     setLoading(false);
   }, [symbol, ltp, changePercent]);
 
   useEffect(() => { if (symbol && ltp) fetchData(activeTimeframe); }, [symbol, activeTimeframe, fetchData]);
 
-  // Initialize chart
+  // Initialize chart — recreate when timeframe type or theme changes
   useEffect(() => {
     if (!chartContainerRef.current) return;
-    const isIntraday = TIMEFRAMES.find(t => t.key === activeTimeframe)?.type === 'intraday';
     const chart = createChart(chartContainerRef.current, {
       layout: { background: { type: ColorType.Solid, color: colors.bg }, textColor: colors.text, fontFamily: "'DM Sans', sans-serif", fontSize: 11 },
       grid: { vertLines: { color: colors.grid }, horzLines: { color: colors.grid } },
@@ -124,17 +119,17 @@ export default function TradingChart({ symbol, ltp, changePercent }) {
         borderColor: colors.border,
         timeVisible: isIntraday,
         secondsVisible: false,
-        tickMarkFormatter: isIntraday ? (time) => {
-          const d = new Date(time * 1000);
-          return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-        } : undefined,
+        rightOffset: 3,
       },
       localization: {
-        timeFormatter: (time) => {
-          if (typeof time === 'string') return time; // YYYY-MM-DD
-          const d = new Date(time * 1000);
-          return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-        },
+        // IST offset: +5:30 = 330 minutes
+        // This tells Lightweight Charts to display UTC timestamps shifted by +5:30
+        locale: 'en-IN',
+        timeFormatter: isIntraday ? (t) => {
+          // t is UTC timestamp — add IST offset for display
+          const d = new Date((t + 19800) * 1000);
+          return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+        } : undefined,
       },
       handleScroll: { mouseWheel: true, pressedMouseMove: true },
       handleScale: { mouseWheel: true, pinch: true },
@@ -142,10 +137,10 @@ export default function TradingChart({ symbol, ltp, changePercent }) {
     chartRef.current = chart;
     const ro = new ResizeObserver(entries => { if (entries.length && chartContainerRef.current) { const { width, height } = entries[0].contentRect; chart.resize(width, height); } });
     ro.observe(chartContainerRef.current);
-    return () => { ro.disconnect(); chart.remove(); chartRef.current = null; seriesRef.current = null; volumeSeriesRef.current = null; };
-  }, [isDark, activeTimeframe]);
+    return () => { ro.disconnect(); chart.remove(); chartRef.current = null; seriesRef.current = null; volumeSeriesRef.current = null; indicatorSeriesRef.current = []; };
+  }, [isDark, isIntraday]);
 
-  // Update series + indicators
+  // Update series
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart || chartData.length === 0) return;
@@ -225,7 +220,7 @@ export default function TradingChart({ symbol, ltp, changePercent }) {
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 8, height: 2, borderRadius: 1, background: 'var(--green)' }} /> Price</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 8, height: 6, borderRadius: 1, background: 'var(--green)', opacity: 0.3 }} /> Volume</span>
         {activeIndicators.map(id => { const ind = AVAILABLE_INDICATORS.find(i => i.id === id); return ind ? <span key={id} style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 8, height: 2, borderRadius: 1, background: ind.color }} /> {ind.name}</span> : null; })}
-        <span style={{ marginLeft: 'auto' }}>{TIMEFRAMES.find(t => t.key === activeTimeframe)?.type === 'intraday' ? 'Simulated · IST' : 'Yahoo Finance · IST'}</span>
+        <span style={{ marginLeft: 'auto' }}>{isIntraday ? 'Simulated · IST' : 'Yahoo Finance · IST'}</span>
       </div>
     </div>
   );

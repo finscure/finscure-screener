@@ -1,39 +1,5 @@
-// ═══════════════════════════════════════════════════════
-// Simulated OHLC data for intraday timeframes (5min, 15min)
-// All timestamps are in IST (UTC+5:30) — Indian market hours
-// NSE trading: 9:15 AM to 3:30 PM IST
-// ═══════════════════════════════════════════════════════
-
-// IST offset in milliseconds: +5 hours 30 minutes
-const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
-
-/**
- * Create a Date object representing a specific IST time,
- * and return the correct UTC unix timestamp for it.
- */
-function istToUTC(year, month, day, hours, minutes) {
-  // Build the date as if it's UTC, then subtract IST offset
-  // This gives us the UTC moment that corresponds to the given IST time
-  const utcDate = new Date(Date.UTC(year, month, day, hours, minutes, 0, 0));
-  return new Date(utcDate.getTime() - IST_OFFSET_MS);
-}
-
-/**
- * Get current date/time in IST
- */
-function getNowIST() {
-  const now = new Date();
-  return new Date(now.getTime() + IST_OFFSET_MS);
-}
-
-/**
- * Check if a date (in IST) is a weekend
- */
-function isWeekend(year, month, day) {
-  const d = new Date(Date.UTC(year, month, day));
-  const dow = d.getUTCDay();
-  return dow === 0 || dow === 6;
-}
+// Simulated OHLC for intraday timeframes
+// Generates candles with IST timestamps (9:15 AM - 3:30 PM)
 
 export function generateIntradayOHLC(ltp, changePercent, interval = '5min', tradingDays = 5) {
   const candles = [];
@@ -41,42 +7,31 @@ export function generateIntradayOHLC(ltp, changePercent, interval = '5min', trad
 
   const intervalMinutes = interval === '5min' ? 5 : 15;
   const candlesPerDay = Math.floor(375 / intervalMinutes); // NSE: 9:15 AM – 3:30 PM = 375 mins
-
-  // Estimate daily volatility from change%
   const dailyVol = Math.max(Math.abs(changePercent) * 0.01, 0.012);
   const candleVol = dailyVol / Math.sqrt(candlesPerDay);
 
-  // Start price: work backward from LTP
   let currentPrice = ltp * (1 - (changePercent / 100) * tradingDays * 0.2);
+  const now = new Date();
 
   // Get current IST date
-  const nowIST = getNowIST();
-  const todayYear = nowIST.getUTCFullYear();
-  const todayMonth = nowIST.getUTCMonth();
-  const todayDate = nowIST.getUTCDate();
+  const istNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
 
-  // Collect trading days going backward from today
-  const tradingDates = [];
-  let checkDate = new Date(Date.UTC(todayYear, todayMonth, todayDate));
-  while (tradingDates.length < tradingDays) {
-    const y = checkDate.getUTCFullYear();
-    const m = checkDate.getUTCMonth();
-    const d = checkDate.getUTCDate();
-    if (!isWeekend(y, m, d)) {
-      tradingDates.unshift({ year: y, month: m, day: d }); // prepend so oldest first
-    }
-    checkDate.setUTCDate(checkDate.getUTCDate() - 1);
-  }
+  for (let day = tradingDays - 1; day >= 0; day--) {
+    const date = new Date(istNow);
+    date.setDate(date.getDate() - day);
 
-  // Generate candles for each trading day
-  for (const td of tradingDates) {
+    // Skip weekends
+    if (date.getDay() === 0 || date.getDay() === 6) continue;
+
     for (let c = 0; c < candlesPerDay; c++) {
-      const candleHour = 9 + Math.floor((15 + c * intervalMinutes) / 60);
-      const candleMin = (15 + c * intervalMinutes) % 60;
+      // Create IST time: 9:15 AM + c * interval
+      const hour = Math.floor((9 * 60 + 15 + c * intervalMinutes) / 60);
+      const minute = (9 * 60 + 15 + c * intervalMinutes) % 60;
 
-      // Get UTC timestamp for this IST time
-      const utcMoment = istToUTC(td.year, td.month, td.day, candleHour, candleMin);
-      const timestamp = Math.floor(utcMoment.getTime() / 1000);
+      // Build a Date object in IST, then convert to UTC unix timestamp
+      const istDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute, 0);
+      // Convert IST to UTC: subtract 5h30m
+      const utcTimestamp = Math.floor(istDate.getTime() / 1000) - 19800;
 
       const open = currentPrice;
       const bias = changePercent >= 0 ? 0.48 : 0.52;
@@ -87,7 +42,7 @@ export function generateIntradayOHLC(ltp, changePercent, interval = '5min', trad
       const low = Math.min(open, close) - Math.abs(move2) * 0.5;
 
       candles.push({
-        time: timestamp,
+        time: utcTimestamp,
         open: parseFloat(open.toFixed(2)),
         high: parseFloat(high.toFixed(2)),
         low: parseFloat(low.toFixed(2)),
@@ -99,7 +54,7 @@ export function generateIntradayOHLC(ltp, changePercent, interval = '5min', trad
     }
   }
 
-  // Scale all candles so the last candle's close matches actual LTP
+  // Scale all candles so last close matches actual LTP
   if (candles.length > 0) {
     const scaleFactor = ltp / candles[candles.length - 1].close;
     if (isFinite(scaleFactor) && scaleFactor > 0) {

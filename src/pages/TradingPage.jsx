@@ -30,27 +30,23 @@ const fmt = n => { if (!n && n !== 0) return "₹0"; const a = Math.abs(n); if (
 const QTY_BUTTONS = [1, 5, 10, 25, 50];
 const PIE_COLORS = ["#63dca0","#60a5fa","#fbbf24","#a78bfa","#f97316","#22d3ee","#f87171","#34d399","#e879f9","#fb923c"];
 
-// IST market hours check
+// IST market hours — uses toLocaleString for reliable IST
+function getISTNow() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+}
+
 function isMarketOpen() {
-  const now = new Date();
-  const istOffset = 5.5 * 60 * 60 * 1000;
-  const ist = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
+  const ist = getISTNow();
   const day = ist.getDay();
-  const h = ist.getHours();
-  const m = ist.getMinutes();
-  const mins = h * 60 + m;
-  if (day === 0 || day === 6) return false; // Weekend
-  return mins >= 555 && mins <= 930; // 9:15 (555) to 15:30 (930)
+  const mins = ist.getHours() * 60 + ist.getMinutes();
+  if (day === 0 || day === 6) return false;
+  return mins >= 555 && mins <= 930;
 }
 
 function getMarketStatus() {
-  const now = new Date();
-  const istOffset = 5.5 * 60 * 60 * 1000;
-  const ist = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
+  const ist = getISTNow();
   const day = ist.getDay();
-  const h = ist.getHours();
-  const m = ist.getMinutes();
-  const mins = h * 60 + m;
+  const mins = ist.getHours() * 60 + ist.getMinutes();
   if (day === 0 || day === 6) return { open: false, text: "Markets Closed (Weekend)", nextOpen: "Monday 9:15 AM" };
   if (mins < 555) return { open: false, text: "Pre-Market", nextOpen: "Opens at 9:15 AM IST" };
   if (mins > 930) return { open: false, text: "Markets Closed", nextOpen: "Opens tomorrow 9:15 AM IST" };
