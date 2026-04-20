@@ -2,49 +2,61 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ═══ ADMIN CONFIG ═══
+    // Admin UIDs stored in platform_config/admin doc
+    // Admins can read all data across all collections
+    function isAdmin() {
+      return request.auth != null && 
+        exists(/databases/$(database)/documents/platform_config/admin) &&
+        request.auth.uid in get(/databases/$(database)/documents/platform_config/admin).data.uids;
+    }
+
+    // ═══ PLATFORM CONFIG ═══
+    // Only admins can read/write config
+    match /platform_config/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
     // ═══ USERS ═══
-    // Users can read/write only their own profile
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      // Admin can read all users (set custom claim admin=true via Firebase Admin SDK)
-      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow read: if isAdmin();
     }
 
     // ═══ PROGRESS ═══
-    // Progress docs are keyed as {userId}_{courseId}
-    // Users can only access their own progress
     match /progress/{docId} {
       allow read, write: if request.auth != null && docId.matches(request.auth.uid + '_.*');
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
     }
 
     // ═══ MOCK PORTFOLIOS ═══
-    // Portfolios are keyed by userId
     match /mock_portfolios/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isAdmin();
     }
 
     // ═══ MOCK TRANSACTIONS ═══
-    // Users can read their own transactions, create new ones
     match /mock_transactions/{docId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      // No update/delete — transaction history is immutable
+      allow read: if isAdmin();
     }
 
     // ═══ MOCK PENDING ORDERS ═══
-    // Users can create, read, and update their own pending orders
     match /mock_pending_orders/{docId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
     }
 
     // ═══ MOCK WATCHLISTS ═══
-    // Users can read/write their own watchlist
     match /mock_watchlists/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isAdmin();
     }
 
     // ═══ DENY EVERYTHING ELSE ═══
