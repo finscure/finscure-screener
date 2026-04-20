@@ -65,12 +65,12 @@ import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, orderBy,
 // Get it from: Firebase Console → Project Settings → Your apps → Config
 // ═══════════════════════════════════════════════
 const firebaseConfig = {
-  apiKey: "AIzaSyCnLNoKgkXsME2U9gHVt4pFUZtv3xbMUTA",
+  apiKey: "YOUR_API_KEY",
   authDomain: "finscure-screener.firebaseapp.com",
   projectId: "finscure-screener",
   storageBucket: "finscure-screener.firebasestorage.app",
-  messagingSenderId: "306981915645",
-  appId: "1:306981915645:web:1657a493dde06f5f6d6794"
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID",
 };
 // ═══════════════════════════════════════════════
 
@@ -174,7 +174,7 @@ function renderDashboard(user) {
   const onboarded = users.filter(u => u.interface_stage !== undefined).length;
   const stageCount = { 1: 0, 2: 0, 3: 0, 4: 0 };
   users.forEach(u => { if (u.interface_stage) stageCount[u.interface_stage] = (stageCount[u.interface_stage] || 0) + 1; });
-  const recentUsers = [...users].sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || "")).slice(0, 8);
+  const recentUsers = [...users].sort((a, b) => { const ta = a.createdAt?.toDate?.() || new Date(a.createdAt || 0); const tb = b.createdAt?.toDate?.() || new Date(b.createdAt || 0); return tb - ta; }).slice(0, 8);
   const topTraders = portfolios.sort((a, b) => {
     const aVal = (a.cash || 0) + (a.holdings || []).reduce((s, h) => s + h.qty * h.avgPrice, 0);
     const bVal = (b.cash || 0) + (b.holdings || []).reduce((s, h) => s + h.qty * h.avgPrice, 0);
@@ -236,7 +236,7 @@ function renderDashboard(user) {
   } else if (currentPage === "users") {
     $("pageContent").innerHTML = `
     <div class="section-card"><div class="section-header"><div><div class="section-title">All Users (${users.length})</div></div></div><table><thead><tr><th>Name</th><th>Email</th><th>Stage</th><th>Level</th><th>Joined</th></tr></thead><tbody>
-      ${users.map(u => `<tr><td style="font-weight:600">${u.displayName || "—"}</td><td style="font-size:12px;color:var(--muted)">${u.email || "—"}</td><td><span class="badge badge-${u.interface_stage === 1 ? "green" : u.interface_stage === 2 ? "blue" : u.interface_stage === 3 ? "amber" : "purple"}">Stage ${u.interface_stage || "?"}</span></td><td style="font-size:12px">${u.placement_level || "—"}</td><td style="font-size:12px;color:var(--muted)">${u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : "—"}</td></tr>`).join("")}
+      ${users.map(u => { const d = u.createdAt?.toDate?.() || (u.createdAt ? new Date(u.createdAt) : null); return `<tr><td style="font-weight:600">${u.displayName || "—"}</td><td style="font-size:12px;color:var(--muted)">${u.email || "—"}</td><td><span class="badge badge-${u.interface_stage === 1 ? "green" : u.interface_stage === 2 ? "blue" : u.interface_stage === 3 ? "amber" : "purple"}">Stage ${u.interface_stage || "?"}</span></td><td style="font-size:12px">${u.placement_level || "—"}</td><td style="font-size:12px;color:var(--muted)">${d ? d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : "—"}</td></tr>`; }).join("")}
     </tbody></table></div>`;
   } else if (currentPage === "trades") {
     $("pageContent").innerHTML = `
